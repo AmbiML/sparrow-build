@@ -45,7 +45,7 @@ $(MATCHA_VERILATOR_TB): $(MATCHA_OUT_DIR) verilator
 	cd $(MATCHA_SRC_DIR) && \
 		bazel build //hw:verilator
 	cd $(MATCHA_SRC_DIR) && \
-		cp -rf --no-preserve=mode bazel-bin/hw/build.verilator/* "$(MATCHA_OUT_DIR)" && \
+		cp -rf --no-preserve=mode bazel-bin/hw/build.verilator_real/* "$(MATCHA_OUT_DIR)" && \
 		chmod +x "$(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb"
 
 ## Build Matcha FPGA Target for Nexus Board.
