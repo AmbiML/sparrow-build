@@ -90,7 +90,10 @@ matcha_sw_all:
 #
 matcha_hw_verilator_tests: verilator | $(MATCHA_TESTLOG_DIR)
 	cd $(MATCHA_SRC_DIR) && \
-		bazel test --test_output=errors --test_timeout=180,600,1800,3600 //sw/device/tests:verilator_test_suite
+		bazel test --test_output=errors --test_timeout=180,600,1800,3600 \
+			--local_test_jobs=HOST_CPUS*0.25 \
+			--//hw:make_options=-j,16 \
+			//sw/device/tests:verilator_test_suite
 	cd $(MATCHA_SRC_DIR) && cp -rf "bazel-testlogs/sw" "$(MATCHA_TESTLOG_DIR)"
 
 ## Clean Matcha HW artifact

@@ -18,10 +18,13 @@ earlgrey_hw_verilator_smoketests: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)
 	cd $(OPENTITAN_SRC_DIR) && \
 		bazel query "kind(test, //sw/device/tests:all)" \
 			| grep "_smoketest" \
-			| xargs bazel test  --test_tag_filters=verilator,-broken \
-					--action_env=BITSTREAM=d20fe23d160fea56980790b8d43a73c80e25855c \
-					--test_timeout=180,600,1800,3600 \
-					--test_output=errors
+			| xargs bazel test --test_tag_filters=verilator,-broken \
+				--define bitstream=skip \
+				--test_timeout=180,600,1800,3600 \
+				--test_output=errors \
+				--local_test_jobs=HOST_CPUS*0.25 \
+				--//hw:make_options=-j,8 \
+				--build_tests_only=true
 	cd $(OPENTITAN_SRC_DIR) && \
 		cp -rf "bazel-testlogs/sw/device" "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
@@ -31,11 +34,14 @@ earlgrey_hw_verilator_smoketests: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)
 # Note: This will take hours to finish. Run it with caution.
 earlgrey_hw_verilator_tests_all: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)
 	cd $(OPENTITAN_SRC_DIR) && \
-		bazel query "kind(test, //sw/device/tests:all)" \
-			| xargs bazel test  --test_tag_filters=verilator,-broken \
-					--action_env=BITSTREAM=d20fe23d160fea56980790b8d43a73c80e25855c \
-					--test_timeout=180,600,1800,3600 \
-					--test_output=errors
+		bazel test --test_tag_filters=verilator,-broken \
+			--define bitstream=skip \
+			--test_timeout=180,900,1800,3600 \
+			--test_output=errors \
+			--local_test_jobs=HOST_CPUS*0.25 \
+			--//hw:make_options=-j,8 \
+			--build_tests_only=true \
+			//sw/device/tests:all
 	cd $(OPENTITAN_SRC_DIR) && \
 		cp -rf "bazel-testlogs/sw/device" "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
