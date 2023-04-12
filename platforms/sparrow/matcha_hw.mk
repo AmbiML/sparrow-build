@@ -84,7 +84,14 @@ $(MATCHA_TESTLOG_DIR):
 #
 matcha_sw_all:
 	cd $(MATCHA_SRC_DIR) && \
-	  bazel build --define DISABLE_VERILATOR_BUILD=true //sw/...
+	  bazel build --define DISABLE_VERILATOR_BUILD=true //sw/device/...
+
+## Build opentitantool for matcha FPGA tests
+opentitantool_pkg: | $(MATCHA_OUT_DIR)
+	cd $(MATCHA_SRC_DIR) && \
+	  bazel build //sw:opentitantool_pkg
+	cd $(MATCHA_SRC_DIR) && \
+		cp -f bazel-bin/sw/opentitantool_pkg.tar.gz $(MATCHA_OUT_DIR)
 
 ## Build and run matcha verilator test suite
 #
@@ -103,5 +110,5 @@ matcha_hw_clean:
 		bazel clean --expunge
 
 .PHONY:: matcha_hw_verilator_sim matcha_hw_clean matcha_hw_verilator_tests
-.PHONY:: matcha_sw_all
+.PHONY:: matcha_sw_all opentitantool_pkg
 .PHONY:: matcha_hw_fpga_nexus matcha_hw_fpga_v6
