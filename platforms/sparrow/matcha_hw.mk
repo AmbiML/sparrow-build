@@ -61,19 +61,6 @@ matcha_hw_fpga_nexus: | $(MATCHA_OUT_DIR)
 		find bazel-bin/hw/bitstream/vivado/build.fpga_nexus/ -regex '.*.\(bit\|mmi\)' \
 			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
 
-## Build Matcha FPGA Target for  V6 Board.
-# This target builds the FPGA bit file from hw/matcha using
-# hw/opentitan-upstream as the library. The output is stored in
-# out/matcha/hw/.
-# This target is compute-intensive. Make sure you have a powerful enough machine
-# and Vivado suporting the latest UltraScale device to build it.
-matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
-	cd $(MATCHA_SRC_DIR) && \
-		bazel build //hw/bitstream/vivado:fpga_v6
-	cd $(MATCHA_SRC_DIR) && \
-		find bazel-bin/hw/bitstream/vivado/build.fpga_v6/ -regex '.*.\(bit\|mmi\)' \
-			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
-
 $(MATCHA_TESTLOG_DIR):
 	mkdir -p $(MATCHA_TESTLOG_DIR)
 
@@ -111,4 +98,4 @@ matcha_hw_clean:
 
 .PHONY:: matcha_hw_verilator_sim matcha_hw_clean matcha_hw_verilator_tests
 .PHONY:: matcha_sw_all opentitantool_pkg
-.PHONY:: matcha_hw_fpga_nexus matcha_hw_fpga_v6
+.PHONY:: matcha_hw_fpga_nexus
