@@ -1,7 +1,7 @@
 TBM_SRC_DIR := $(ROOTDIR)/sim/tbm
 
 ## Build TBM simulator
-tbm:
+tbm: flatbuffers
 	$(MAKE) -C $(TBM_SRC_DIR) all
 .PHONY:: tbm
 
