@@ -260,6 +260,13 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     JUMP_TARGETS[build]="${ROOTDIR}/build"
     JUMP_TARGETS[doc]="${ROOTDIR}/doc"
 
+    JUMP_TARGETS[cantrip]="${ROOTDIR}/cantrip/projects/cantrip"
+    JUMP_TARGETS[system]="${ROOTDIR}/cantrip/projects/cantrip/apps/system"
+    JUMP_TARGETS[c-apps]="${ROOTDIR}/cantrip/projects/cantrip/apps/c"
+    JUMP_TARGETS[rust-apps]="${ROOTDIR}/cantrip/projects/cantrip/apps/rust"
+
+    JUMP_TARGETS[tock]="${ROOTDIR}/sw/tock"
+
     function j
     {
         local target="$1"; shift
