@@ -10,9 +10,14 @@ include $(ROOTDIR)/build/platforms/sparrow/sim_sel4test.mk
 
 # Driver include files auto-generated from opentitan definitions.
 
-OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan-upstream
+ifeq ($(OPENTITAN_SOURCE),)
+$(error "OPENTITAN_SOURCE not set. Did build/platforms/sparrow/setup.sh get sourced?")
+endif
 
-OPENTITAN_GEN_DIR=$(CANTRIP_OUT_DIR)/opentitan-gen/include/opentitan
+ifeq ($(OPENTITAN_GEN_DIR),)
+$(error "OPENTITAN_GEN_DIR not set. Did build/platforms/sparrow/setup.sh get sourced?")
+endif
+
 $(OPENTITAN_GEN_DIR):
 	mkdir -p $(OPENTITAN_GEN_DIR)
 

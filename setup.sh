@@ -250,6 +250,8 @@ function kcargo
     )
 }
 
+set-platform ${PLATFORM}
+
 if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     unset JUMP_TARGETS
     declare -Ax JUMP_TARGETS
@@ -264,6 +266,9 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     JUMP_TARGETS[system]="${ROOTDIR}/cantrip/projects/cantrip/apps/system"
     JUMP_TARGETS[c-apps]="${ROOTDIR}/cantrip/projects/cantrip/apps/c"
     JUMP_TARGETS[rust-apps]="${ROOTDIR}/cantrip/projects/cantrip/apps/rust"
+
+    JUMP_TARGETS[debug]="${CANTRIP_OUT_DIR}/debug"
+    JUMP_TARGETS[release]="${CANTRIP_OUT_DIR}/release"
 
     JUMP_TARGETS[tock]="${ROOTDIR}/sw/tock"
 
@@ -337,8 +342,6 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
         complete -F _complete_platform_targets set-platform
     fi
 fi
-
-set-platform ${PLATFORM}
 
 # Explicitly set the variables to run the venv python interpreter.
 export PATH="${PYTHON_SPARROW_ENV}/bin:${PATH}"
