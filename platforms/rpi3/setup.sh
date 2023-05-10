@@ -48,3 +48,5 @@ fi
 export CARGO_HOME="${RUSTDIR}"
 export RUSTUP_HOME="${RUSTDIR}"
 export PATH="${RUSTDIR}/bin:${PATH}"
+
+export CANTRIP_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"
