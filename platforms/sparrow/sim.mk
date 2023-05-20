@@ -62,6 +62,7 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree_model_buil
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
@@ -75,6 +76,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_
 # start.
 debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
