@@ -64,7 +64,7 @@ $(OUT):
 # This includes Rust, GCC, CLANG, verilator, qemu, and renode.
 #
 # Output is placed in cache/ and out/host.
-tools: install_rust install_gcc install_llvm verilator renode qemu
+tools: install_rust install_gcc install_llvm install_kelvin verilator renode qemu
 
 ## Cleans the entire system
 #

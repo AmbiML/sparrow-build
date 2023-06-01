@@ -101,6 +101,9 @@ $(CACHE)/toolchain/bin/riscv32-unknown-elf-gcc: | $(CACHE)
 $(CACHE)/toolchain_iree_rv32imf/bin/clang++: | $(CACHE)
 	./scripts/install-toolchain.sh llvm
 
+$(CACHE)/toolchain_kelvin/bin/riscv32-unknown-elf-gcc: | $(CACHE)
+	./scripts/install-toolchain.sh kelvin
+
 ## Installs the GCC compiler for rv32imac
 #
 # Requires network access. This fetches the toolchain from the GCP archive and
@@ -112,6 +115,8 @@ install_gcc: $(CACHE)/toolchain/bin/riscv32-unknown-elf-gcc
 # Requires network access. This fetches the toolchain from the GCP archive and
 # extracts it locally to the cache/.
 install_llvm: $(CACHE)/toolchain_iree_rv32imf/bin/clang++
+
+install_kelvin: $(CACHE)/toolchain_kelvin/bin/riscv32-unknown-elf-gcc
 
 ## Cleans up the toolchain from the cache directory
 #
