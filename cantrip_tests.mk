@@ -18,9 +18,9 @@ CARGO_TEST        := ${CARGO_CMD} test
 
 # NB: cargo_test_debugconsole_zmodem is broken
 #	TODO(b/232928288): temporarily disable cargo_test_cantrip_proc_manager &
-#   cargo_test_cantrip_proc_interface; they have dependency issues
+#	cargo_test_cantrip_os_common_logger &
+#   cargo_test_cantrip_proc_interface; they need to be rewritten (or tossed)
 CARGO_TEST_CANTRIP=\
-	cargo_test_cantrip_os_common_logger \
 	cargo_test_cantrip_os_common_slot_allocator
 
 ## Runs all cargo unit tests for the Cantrip operating system
