@@ -25,6 +25,11 @@ TOOLCHAINLLVM_SRC_DIR    := $(OUT)/tmp/toolchain/llvm-project
 TOOLCHAINLLVM_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_llvm
 TOOLCHAINLLVM_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/clang
 
+TOOLCHAIN_KELVIN_SRC_DIR := $(OUT)/tmp/toolchain/riscv-gnu-toolchain_kelvin
+TOOLCHAIN_KELVIN_BUILD_DIR := $(OUT)/tmp/toolchain/build_toolchain_kelvin
+TOOLCHAIN_KELVIN_OUT_DIR := $(CACHE)/toolchain_kelvin
+TOOLCHAIN_KELVIN_BIN       := $(TOOLCHAIN_KELVIN_OUT_DIR)/bin/riscv32-unknown-elf-gdb
+
 TOOLCHAIN_BUILD_DATE := $(shell date +%Y-%m-%d)
 
 
@@ -71,6 +76,13 @@ $(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz: $(TOOLCHAIN_BIN)
 # actual tools in `cache/toolchain`, so untarring this tarball is
 # unneccessary.
 toolchain: $(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz
+
+## Cleans up the toolchain from the cache directory
+#
+# Generally not needed to be run unless something has changed or broken in the
+# caching mechanisms built into the build system.
+toolchain_clean:
+	rm -rf "$(TOOLCHAIN_OUT_DIR)" "$(TOOLCHAIN_SRC_DIR)" "$(TOOLCHAIN_BUILD_DIR)"
 
 toolchain_src_llvm:
 	if [[ -f "${TOOLCHAINLLVM_BIN}" ]]; then \
@@ -144,4 +156,58 @@ toolchain_llvm: $(OUT)/toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINIREE_OUT_DIR) $(OUT)/tmp/toolchain
 
-.PHONY:: toolchain toolchain_llvm toolchain_src toolchain_src_llvm toolchain_llvm_clean
+
+toolchain_kelvin_src:
+	if [[ -f "${TOOLCHAIN_KELVIN_BIN}" ]]; then \
+		echo "Toolchain exists, run 'm toolchain_kelvin_clean' if you really want to rebuild"; \
+	else \
+		"$(ROOTDIR)/scripts/download-toolchain.sh" "$(TOOLCHAIN_KELVIN_SRC_DIR)" KELVIN; \
+	fi
+
+$(TOOLCHAIN_KELVIN_BUILD_DIR):
+	mkdir -p $(TOOLCHAIN_KELVIN_BUILD_DIR)
+
+# Note it does not support python GDB, for we can't support CentOS7 (EDACloud)
+# properly.
+# Also pin the i ISA version to 2.1
+$(TOOLCHAIN_KELVIN_BIN): | toolchain_kelvin_src $(TOOLCHAIN_KELVIN_BUILD_DIR)
+	cd $(TOOLCHAIN_KELVIN_BUILD_DIR) && $(TOOLCHAIN_KELVIN_SRC_DIR)/configure \
+		--srcdir=$(TOOLCHAIN_KELVIN_SRC_DIR) \
+		--prefix=$(TOOLCHAIN_KELVIN_OUT_DIR) \
+		--with-arch=rv32i2p1m_zicsr_zifencei_zbb \
+		--with-abi=ilp32
+# binutil_2.40 has special doc targets for gas/doc/asconfig.texi. Need to patch the
+# configured Makefile.
+	./scripts/update-toolchain-makefile.sh "$(TOOLCHAIN_KELVIN_BUILD_DIR)/Makefile"
+	$(MAKE) -C $(TOOLCHAIN_KELVIN_BUILD_DIR)
+	$(MAKE) -C $(TOOLCHAIN_KELVIN_BUILD_DIR) clean
+
+$(OUT)/toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz: $(TOOLCHAIN_KELVIN_BIN)
+	tar -C $(CACHE) -czf \
+		"$(OUT)/toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz" toolchain_kelvin
+	cd $(OUT) && sha256sum "toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz" > \
+		"toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz.sha256sum"
+	@echo "==========================================================="
+	@echo "Kelvin Toolchain tarball ready at $(OUT)/toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz"
+	@echo "==========================================================="
+
+## Builds Kelvin GCC toolchain.
+#
+# Note: this actually builds from source, rather than fetching a release
+# tarball, and is most likely not the target you actually want.
+#
+# This target can take hours to build, and results in a tarball and sha256sum
+# called `out/toolchain_kelvin_<timestamp>.tar.gz` and
+# `out/toolchain_kelvin_<timestamp>.tar.gz.sha256sum`, ready for
+# upload. In the process of generating this tarball, this target also builds the
+# actual tools in `cache/toolchain_kelvin`, so untarring this tarball is
+# unneccessary.
+toolchain_kelvin: $(OUT)/toolchain_kelvin_$(TOOLCHAIN_BUILD_DATE).tar.gz
+
+## Removes the Kelvin toolchain from cache/, forcing a re-fetch if needed.
+toolchain_kelvin_clean:
+	rm -rf "$(TOOLCHAIN_KELVIN_OUT_DIR)" "$(TOOLCHAIN_KELVIN_SRC_DIR)" "$(TOOLCHAIN_KELVIN_BUILD_DIR)"
+
+.PHONY:: toolchain toolchain_src toolchain_clean
+.PHONY:: toolchain_llvm toolchain_src_llvm toolchain_llvm_clean
+.PHONY:: toolchain_kelvin toolchain_kelvin_src toolchain_kelvin_clean

@@ -116,14 +116,11 @@ install_gcc: $(CACHE)/toolchain/bin/riscv32-unknown-elf-gcc
 # extracts it locally to the cache/.
 install_llvm: $(CACHE)/toolchain_iree_rv32imf/bin/clang++
 
-install_kelvin: $(CACHE)/toolchain_kelvin/bin/riscv32-unknown-elf-gcc
-
-## Cleans up the toolchain from the cache directory
+## Installs the Kelvin GCC toolchain (rv32im + kelvin ops)
 #
-# Generally not needed to be run unless something has changed or broken in the
-# caching mechanisms built into the build system.
-toolchain_clean:
-	rm -rf $(OUT)/tmp $(CACHE)/toolchain
+# Requires network access. This fetches the toolchain from the GCS archive and
+# extracts it locally to the cache/.
+install_kelvin: $(CACHE)/toolchain_kelvin/bin/riscv32-unknown-elf-gcc
 
 ## Removes only the QEMU build artifacts from out/
 qemu_clean:
