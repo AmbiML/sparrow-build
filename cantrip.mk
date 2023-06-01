@@ -57,13 +57,14 @@ CANTRIP_SOURCES := $(shell find $(ROOTDIR)/cantrip \(\
 
 ## Builds auto-generated include files for the Cantrip operating system
 #
-# In the generic case, this is a noop. But it's an aggregate target,
-# so that platform-specific headers may also be generated from other
+# In the generic case, this doesn't do anything except generate headers for our
+# Rust components to use from the CAmkES assemblies. It's an aggregate target,
+# though, so that platform-specific headers may also be generated from other
 # parts of the project.
 #
 # Note: this is a platform-specific aggregate phony target, and additional rules
 # for each platform are defined in build/$PLATFORM/platform.mk
-cantrip-gen-headers::
+cantrip-gen-headers:: cantrip-component-headers
 
 ## Cleans the auto-generated Cantrip include files
 #
@@ -101,8 +102,21 @@ cantrip-build-release-prepare:: | $(CANTRIP_OUT_RELEASE)
 cantrip-clean:
 	rm -rf $(CANTRIP_OUT_DIR)
 
+$(RUSTDIR)/bin/cbindgen: | rust_presence_check
+	${CARGO_CMD} install cbindgen
+
 $(OUT)/cantrip/components:
 	mkdir -p $(OUT)/cantrip/components
+
+## Builds cbindgen headers for Cantrip components
+#
+# This target regenerates these header definitions using Makefiles embedded in
+# each component's source tree.
+cantrip-component-headers: $(RUSTDIR)/bin/cbindgen | rust_presence_check $(OUT)/cantrip/components
+	for f in $$(find $(CANTRIP_COMPONENTS) -name cbindgen.toml); do \
+		dir=$$(dirname $$f); \
+		test -f $$dir/Makefile && $(MAKE) -C $$dir; \
+	done
 
 $(CANTRIP_OUT_DEBUG):
 	mkdir -p $(CANTRIP_OUT_DEBUG)
