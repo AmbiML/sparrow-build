@@ -1,5 +1,6 @@
 include $(ROOTDIR)/build/platforms/sparrow/cantrip.mk
 include $(ROOTDIR)/build/platforms/sparrow/cantrip_builtins.mk
+include $(ROOTDIR)/build/platforms/sparrow/kelvin.mk
 include $(ROOTDIR)/build/platforms/sparrow/opentitan_sw.mk
 include $(ROOTDIR)/build/platforms/sparrow/opentitan_hw.mk
 include $(ROOTDIR)/build/platforms/sparrow/matcha_hw.mk
