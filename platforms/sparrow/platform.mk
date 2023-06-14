@@ -6,14 +6,21 @@ CANTRIP_PLATFORM_APT_DEPS=\
 
 include $(ROOTDIR)/build/platforms/sparrow/cantrip.mk
 include $(ROOTDIR)/build/platforms/sparrow/cantrip_builtins.mk
+include $(ROOTDIR)/build/platforms/sparrow/iree.mk
 include $(ROOTDIR)/build/platforms/sparrow/kelvin.mk
-include $(ROOTDIR)/build/platforms/sparrow/opentitan_sw.mk
-include $(ROOTDIR)/build/platforms/sparrow/opentitan_hw.mk
 include $(ROOTDIR)/build/platforms/sparrow/matcha_hw.mk
-include $(ROOTDIR)/build/platforms/sparrow/springbok.mk
-include $(ROOTDIR)/build/platforms/sparrow/tock.mk
+include $(ROOTDIR)/build/platforms/sparrow/opentitan_hw.mk
+include $(ROOTDIR)/build/platforms/sparrow/opentitan_sw.mk
+include $(ROOTDIR)/build/platforms/sparrow/renode.mk
+include $(ROOTDIR)/build/platforms/sparrow/riscv_toolchain.mk
+include $(ROOTDIR)/build/platforms/sparrow/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/platforms/sparrow/sim.mk
 include $(ROOTDIR)/build/platforms/sparrow/sim_sel4test.mk
+include $(ROOTDIR)/build/platforms/sparrow/springbok.mk
+include $(ROOTDIR)/build/platforms/sparrow/tbm.mk
+include $(ROOTDIR)/build/platforms/sparrow/tock.mk
+include $(ROOTDIR)/build/platforms/sparrow/verible.mk
+include $(ROOTDIR)/build/platforms/sparrow/verilator.mk
 
 # Driver include files auto-generated from opentitan definitions.
 
