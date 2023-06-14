@@ -1,3 +1,9 @@
+# Platform-specific requirements handled by "m prereqs"
+CANTRIP_PLATFORM_PYTHON_DEPS=\
+    ${ROOTDIR}/hw/opentitan-upstream/python-requirements.txt
+CANTRIP_PLATFORM_APT_DEPS=\
+    ${ROOTDIR}/hw/opentitan-upstream/apt-requirements.txt
+
 include $(ROOTDIR)/build/platforms/sparrow/cantrip.mk
 include $(ROOTDIR)/build/platforms/sparrow/cantrip_builtins.mk
 include $(ROOTDIR)/build/platforms/sparrow/kelvin.mk

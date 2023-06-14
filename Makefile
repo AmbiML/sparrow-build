@@ -22,19 +22,6 @@ endif
 
 include $(ROOTDIR)/build/preamble.mk
 
-## Installs build prerequisites
-#
-# This installs a series of typical Linux tools needed to build the whole of the
-# sparrow system.
-prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
-		 $(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt \
-		 $(ROOTDIR)/scripts/python-requirements.txt \
-		 $(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt
-	$(ROOTDIR)/scripts/install-prereqs.sh \
-		-p "$(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt \
-			$(ROOTDIR)/scripts/python-requirements.txt" \
-		-a "$(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt"
-
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/cantrip.mk
 include $(ROOTDIR)/build/cantrip_tools.mk
@@ -54,6 +41,19 @@ include $(ROOTDIR)/build/spike.mk
 include $(ROOTDIR)/build/tbm.mk
 
 include $(ROOTDIR)/build/platforms/$(PLATFORM)/platform.mk
+
+## Installs build prerequisites
+#
+# This installs a series of typical Linux tools needed to build the whole of the
+# sparrow system.
+prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
+		 $(ROOTDIR)/scripts/python-requirements.txt \
+		 ${CANTRIP_PLATFORM_PYTHON_DEPS} \
+		 ${CANTRIP_PLATFORM_APT_DEPS}
+	$(ROOTDIR)/scripts/install-prereqs.sh \
+		-p "$(ROOTDIR)/scripts/python-requirements.txt \
+			 ${CANTRIP_PLATFORM_PYTHON_DEPS}" \
+		-a "${CANTRIP_PLATFORM_APT_DEPS}"
 
 $(OUT):
 	@mkdir -p $(OUT)
