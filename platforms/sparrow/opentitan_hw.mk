@@ -12,6 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+OPENTITAN_SRC_DIR             := $(ROOTDIR)/hw/opentitan-upstream
+OPENTITAN_BUILD_DIR           := $(OUT)/opentitan/sw
+OPENTITAN_BUILD_OUT_DIR       := $(OPENTITAN_BUILD_DIR)/build-out
+OPENTITAN_BUILD_SW_DIR        := $(OPENTITAN_BUILD_DIR)/build-out/sw
+OPENTITAN_BUILD_SW_DEVICE_DIR := $(OPENTITAN_BUILD_DIR)/build-out/sw/device
+OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR := $(OPENTITAN_BUILD_DIR)/build-out/sw/device/tests
+OPENTITAN_BUILD_LOG_DIR       := $(OPENTITAN_BUILD_DIR)/build-log
+OPENTITAN_BUILD_LOG_SW_DIR    := $(OPENTITAN_BUILD_DIR)/build-log/sw
+
+$(OPENTITAN_BUILD_OUT_DIR):
+	@echo "Creating output directory $(OPENTITAN_BUILD_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_SW_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)"
+
+$(OPENTITAN_BUILD_LOG_DIR):
+	@echo "Creating log directory $(OPENTITAN_BUILD_LOG_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_LOG_DIR)"
+	@mkdir -p "$(OPENTITAN_BUILD_LOG_SW_DIR)"
+
 ## Run OpenTitan earlgrey smoketests in verilator
 # Build the verilated model, the test software and runs the tests
 earlgrey_hw_verilator_smoketests: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)

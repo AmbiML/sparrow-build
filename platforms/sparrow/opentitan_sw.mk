@@ -12,21 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-OPENTITAN_SRC_DIR             := $(ROOTDIR)/hw/opentitan-upstream
-OPENTITAN_BUILD_DIR           := $(OUT)/opentitan/sw
-OPENTITAN_BUILD_OUT_DIR       := $(OPENTITAN_BUILD_DIR)/build-out
-OPENTITAN_BUILD_SW_DIR        := $(OPENTITAN_BUILD_DIR)/build-out/sw
-OPENTITAN_BUILD_SW_DEVICE_DIR := $(OPENTITAN_BUILD_DIR)/build-out/sw/device
-OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR := $(OPENTITAN_BUILD_DIR)/build-out/sw/device/tests
-OPENTITAN_BUILD_LOG_DIR       := $(OPENTITAN_BUILD_DIR)/build-log
-OPENTITAN_BUILD_LOG_SW_DIR    := $(OPENTITAN_BUILD_DIR)/build-log/sw
-
-$(OPENTITAN_BUILD_OUT_DIR):
-	@echo "Creating output directory $(OPENTITAN_BUILD_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_SW_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)"
 
 ## Builds the hardware testing binaries from OpenTitan in hw/opentitan-upstream
 # The output is stored at out/opentitan/sw/build-out/sw/device
@@ -86,11 +71,6 @@ opentitan_sw_verilator_sim: | $(OPENTITAN_BUILD_OUT_DIR) \
                               opentitan_sw_helloworld \
                               opentitan_sw_bootrom \
                               opentitan_opt_img
-
-$(OPENTITAN_BUILD_LOG_DIR):
-	@echo "Creating log directory $(OPENTITAN_BUILD_LOG_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_LOG_DIR)"
-	@mkdir -p "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
 ## Build and run host based opentitan unittests
 # The artifacts are stored at out/opentitan/sw/build-out/sw/device
