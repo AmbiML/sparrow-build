@@ -40,6 +40,7 @@ export REGTOOL="${OPENTITAN_SOURCE}/util/regtool.py"
 export MBOX_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/tlul_mailbox/data/tlul_mailbox.hjson"
 export TIMER_HJSON="${OPENTITAN_GEN_DIR}/rv_timer.hjson"
 export UART_HJSON="${OPENTITAN_SOURCE}/hw/ip/uart/data/uart.hjson"
+export VC_TOP_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/vc_top/data/vc_top.hjson"
 
 function parting_messages() {
     if [[ ! -d "${RUSTDIR}" ]] ||
