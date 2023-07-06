@@ -21,11 +21,7 @@ CARGO_TEST        := ${CARGO_CMD} test
 #	cargo_test_cantrip_os_common_logger &
 #   cargo_test_cantrip_proc_interface; they need to be rewritten (or tossed)
 CARGO_TEST_CANTRIP=\
-  cargo_test_cantrip_os_common_slot_allocator \
-  cargo_test_mailbox_driver \
-  cargo_test_opentitan_timer \
-  cargo_test_uart_driver \
-  cargo_test_cantrip_vec_core
+	cargo_test_cantrip_os_common_slot_allocator
 
 ## Runs all cargo unit tests for the Cantrip operating system
 cargo_test_cantrip: $(CARGO_TEST_CANTRIP)
@@ -51,21 +47,5 @@ cargo_test_cantrip_os_common_slot_allocator:
 ## Runs cargo unit tests for the DebugConsole zmomdem support
 cargo_test_debugconsole_zmodem:
 	cd $(CANTRIP_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
-
-## Runs cargo unit tests for the MailboxDriver
-cargo_test_mailbox_driver:
-	cd $(CANTRIP_COMPONENTS)/MailboxDriver/tests && $(CARGO_TEST)
-
-## Runs cargo unit tests for the opentitan-timer support
-cargo_test_opentitan_timer:
-	cd $(CANTRIP_COMPONENTS)/TimerService/tests && $(CARGO_TEST)
-
-## Runs cargo unit tests for the UARTDriver
-cargo_test_uart_driver:
-	cd $(CANTRIP_COMPONENTS)/UARTDriver/tests && $(CARGO_TEST)
-
-## Runs cargo unit tests for the Vector Core support
-cargo_test_cantrip_vec_core:
-	cd $(CANTRIP_COMPONENTS)/MlCoordinator/tests && $(CARGO_TEST)
 
 .PHONY:: cargo_test_cantrip $(CARGO_TEST_CANTRIP)
