@@ -217,7 +217,7 @@ function kcargo
         fi
     fi
 
-    local SEL4_PLATFORM=$(awk '/CONFIG_PLATFORM/{print $3}' "$ROOTDIR/build/platforms/$PLATFORM/cantrip.mk")
+    local SEL4_PLATFORM=$(awk '$1 == "CONFIG_PLATFORM" {print $3}' "$ROOTDIR/build/platforms/$PLATFORM/cantrip.mk")
     local RUST_TARGET=$(awk '/RUST_TARGET/{print $3}' "$ROOTDIR/build/platforms/$PLATFORM/cantrip_apps.mk")
 
     local CARGO_CMD="cargo +${CANTRIP_RUST_VERSION}"
