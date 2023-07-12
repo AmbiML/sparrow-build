@@ -1,0 +1,36 @@
+builtins
+start hello
+sleep 100
+stop hello
+
+start fibonacci
+sleep 1000
+stop fibonacci
+
+start keyval
+sleep 100
+stop keyval
+
+start logtest
+sleep 100
+stop logtest
+
+start panic
+sleep 100
+stop panic
+
+start timer
+sleep 2500
+stop timer
+
+bundles
+mstats
+
+mstats
+start mltest
+mstats
+sleep 10000
+stop mltest
+
+bundles
+mstats

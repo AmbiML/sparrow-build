@@ -30,6 +30,9 @@ ELFCONVERT := $(OUT)/host/debug/elfconvert
 	$(ELFCONVERT) -f app -i $< -o $@
 
 %.model: % | elfconvert
-	$(ELFCONVERT) -f model -i $< -o $@
+	$(ELFCONVERT) -f springbok -i $< -o $@
+
+%.kelvin: %.elf | elfconvert
+	$(ELFCONVERT) -f kelvin -i $< -o $@
 
 .PHONY:: elfconvert

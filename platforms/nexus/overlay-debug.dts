@@ -1,0 +1,19 @@
+/*
+ * Copyright 2021, HENSOLDT Cyber
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later or BSD-3-Clause
+ */
+
+/ {
+  /*
+   * Override memory configuration for debug in simulation. The
+   * real hardware has 4MiB of RAM while the debug simulation
+   * uses 64MiB.
+   */
+  memory@28000000 {
+    #address-cells = <1>;
+    #size-cells = <1>;
+    device_type = "memory";
+    reg = <0x28000000 0x4000000>;
+  };
+};

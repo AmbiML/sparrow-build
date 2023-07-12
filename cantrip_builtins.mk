@@ -28,10 +28,6 @@ include $(ROOTDIR)/build/platforms/$(PLATFORM)/cantrip_builtins.mk
 CPIO ?= cpio
 BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=root:root
 
-# HACK(jtgans): Fix the IREE targets to explicitly list the files it generates.
-$(patsubst %.model,%,$(CANTRIP_MODEL_RELEASE)): iree_model_builtins
-$(patsubst %.model,%,$(CANTRIP_MODEL_DEBUG)): iree_model_builtins
-
 $(CANTRIP_OUT_RELEASE)/builtins: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS}
 	rm -rf $@
 	mkdir -p $@
