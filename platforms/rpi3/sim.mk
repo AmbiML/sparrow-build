@@ -15,9 +15,17 @@
 sim_configs::
 clean_sim_configs::
 
+# qemu fixes the memory size according to the machine type. If you use
+# other than the default you also need to adjust CPIO_BASE_ADDR in the
+# platform.camkes.
+MEMORY_SIZE=1G      # raspi3b
+QEMU_MACHINE=raspi3b
+#MEMORY_SIZE=512M    # raspi3ap
+#QEMU_MACHINE=raspi3ap
+
 QEMU := qemu-system-aarch64
-QEMU_CMD := ${QEMU} -machine raspi3b -nographic -serial null \
-	-serial mon:stdio -m size=1024M
+QEMU_CMD := ${QEMU} -machine ${QEMU_MACHINE} -nographic -serial null \
+	-serial mon:stdio -m size=${MEMORY_SIZE}
 
 ## Checks for qemu presence
 #
@@ -46,22 +54,20 @@ $(CANTRIP_OUT_RELEASE)/capdl-loader-image: $(CANTRIP_KERNEL_RELEASE) \
 
 # XXX no dep on system.camkes
 $(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio \
-		${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h
-	dd if=/dev/zero of=$@ bs=1G count=1
+		${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h \
+    $(ROOTDIR)/build/platforms/rpi3/sim.mk \
+    ${CANTRIP_SRC_DIR}/apps/system/platforms/bcm2837/system.camkes
+	dd if=/dev/zero of=$@ bs=${MEMORY_SIZE} count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
 	' ${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h) && \
 	DD_ARGS=$$(awk ' \
-        /CPIO_SIZE_BYTES/ { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
-        /CPIO_BASE_ADDR/ { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
+        /^#define[ ]+CPIO_SIZE_BYTES/ { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
+        /^#define[ ]+CPIO_BASE_ADDR/ { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
 	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/platform.camkes) && \
 	dd if=$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
 
 ## Debug version of the `simulate` target
-#
-# This top-level target does the same job as `simulate`, but instead of
-# unhalting the CPUs and starting the system, this alternate target only unhalts
-# cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: ${CANTRIP_OUT_DEBUG}/cantrip.mem ${CANTRIP_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
 	$(QEMU_CMD) -s \
 	-kernel ${CANTRIP_OUT_DEBUG}/capdl-loader-image \
@@ -72,7 +78,7 @@ $(CANTRIP_OUT_DEBUG)/capdl-loader-image: $(CANTRIP_KERNEL_DEBUG) $(CANTRIP_ROOTS
 
 # XXX no dep on system.camkes
 $(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h
-	dd if=/dev/zero of=$@ bs=1G count=1
+	dd if=/dev/zero of=$@ bs=${MEMORY_SIZE} count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
 	' ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h) && \
