@@ -59,3 +59,16 @@ function parting_messages() {
         [[ -d "${ROOTDIR}/cache/renode" ]] || echo "${ROOTDIR}/cache/renode is missing!"
     fi
 }
+
+function sim_kelvin
+{
+    local command="start;"
+    if [[ "$2" == "debug" ]]; then
+        command="machine StartGdbServer 3333;"
+    fi
+    local bin_file=$(realpath $1)
+    (cd "${ROOTDIR}" && renode -e "\$bin=@${bin_file}; i @sim/config/kelvin.resc; \
+    ${command} sysbus.vec_controlblock WriteDoubleWord 0xc 0" \
+        --disable-xwt --console)
+
+}
