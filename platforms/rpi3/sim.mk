@@ -52,9 +52,9 @@ $(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio \
 		/\<CONFIG_PLAT\>/ { print $$3 } \
 	' ${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h) && \
 	DD_ARGS=$$(awk ' \
-        /cpio.cpio_size = / { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
-        /cpio.cpio_paddr = / { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
-	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/system.camkes) && \
+        /CPIO_SIZE_BYTES/ { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
+        /CPIO_BASE_ADDR/ { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
+	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/platform.camkes) && \
 	dd if=$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
 
 ## Debug version of the `simulate` target
