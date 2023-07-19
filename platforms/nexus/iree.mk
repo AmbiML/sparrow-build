@@ -1,4 +1,4 @@
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
 # limitations under the License.
 
 IREE_SRC:=$(ROOTDIR)/toolchain/iree
-TOOLCHAINRV32_PATH:=$(CACHE)/toolchain_iree_rv32imf
+TOOLCHAINRV32_PATH:=$(CACHE)/toolchain_kelvin
 IREE_COMPILER_DIR:=${CACHE}/iree_compiler
 
 IREE_RUNTIME_ROOT:=$(ROOTDIR)/sw/vec_iree
 MODEL_SRC_DIR:=$(ROOTDIR)/ml/ml-models-public
-IREE_RUNTIME_OUT=$(OUT)/springbok_iree
-IREE_RUNTIME_NO_WMMU_OUT=$(OUT)/springbok_iree_no_wmmu
+IREE_RUNTIME_OUT=$(OUT)/kelvin_iree
+IREE_RUNTIME_STATS_OUT=$(OUT)/kelvin_iree_stats
 
 MODEL_INTERNAL_SRC_DIR:=$(ROOTDIR)/ml/ml-models
-IREE_RUNTIME_INTERNAL_OUT=$(OUT)/springbok_iree_internal
-IREE_RUNTIME_INTERNAL_NO_WMMU_OUT=$(OUT)/springbok_iree_internal_no_wmmu
+IREE_RUNTIME_INTERNAL_OUT=$(OUT)/kelvin_iree_internal
+IREE_RUNTIME_INTERNAL_STATS_OUT=$(OUT)/kelvin_iree_internal_stats
 
 RV32_EXE_LINKER_FLAGS=-Wl,--print-memory-usage
 
@@ -49,7 +49,7 @@ iree_check:
 
 $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_COMPILER_DIR) \
-	    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+	    -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
 	    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	    -DCMAKE_INSTALL_PREFIX=$(IREE_COMPILER_DIR)/install \
 	    -DIREE_HAL_DRIVERS_TO_BUILD="Dylib;VMVX" \
@@ -77,24 +77,22 @@ iree_commit_check:
 	$(ROOTDIR)/scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
 
 IREE_RUNTIME_DEFAULT_CONFIG :=\
-	-DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	-DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree_gcc.cmake" \
 	-DCMAKE_BUILD_TYPE=MinSizeRel \
 	-DIREE_HOST_BIN_DIR="$(IREE_COMPILER_DIR)/install/bin" \
 	-DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
 	-DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	-DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
-	-DBUILD_WITH_KELVIN=OFF
+	-DBUILD_WITH_KELVIN=ON \
+	-DBUILD_WITH_RVV=OFF
 
 IREE_RUNTIME_CONFIG :=\
 	$(IREE_RUNTIME_DEFAULT_CONFIG) \
-	-DBUILD_NO_WMMU=OFF \
 	-DPRINT_IREE_STATS=OFF
 
-IREE_RUNTIME_NO_WMMU_CONFIG :=\
+IREE_RUNTIME_STATS_CONFIG :=\
 	$(IREE_RUNTIME_DEFAULT_CONFIG) \
-	-DBUILD_NO_WMMU=ON \
-	-DPRINT_IREE_STATS=ON \
-	-DSPRINGBOK_LINKER_SCRIPT=$(realpath $(ROOTDIR)/sw/vec/springbok/springbok_no_wmmu.ld)
+	-DPRINT_IREE_STATS=ON
 
 $(IREE_RUNTIME_OUT)/build.ninja: | iree_compiler iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
@@ -113,21 +111,21 @@ $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 	    $(IREE_RUNTIME_CONFIG) \
 	    $(MODEL_INTERNAL_SRC_DIR)
 
-$(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
-	cmake -G Ninja -B $(IREE_RUNTIME_NO_WMMU_OUT) \
-	    $(IREE_RUNTIME_NO_WMMU_CONFIG) \
+$(IREE_RUNTIME_STATS_OUT)/build.ninja: | iree_check iree_commit_check
+	cmake -G Ninja -B $(IREE_RUNTIME_STATS_OUT) \
+	    $(IREE_RUNTIME_STATS_CONFIG) \
 	    $(MODEL_SRC_DIR)
 
-$(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
-	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT) \
-	    $(IREE_RUNTIME_NO_WMMU_CONFIG) \
+$(IREE_RUNTIME_INTERNAL_STATS_OUT)/build.ninja: | iree_check iree_commit_check
+	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_STATS_OUT) \
+	    $(IREE_RUNTIME_STATS_CONFIG) \
 	    $(MODEL_INTERNAL_SRC_DIR)
 
 ## Installs the IREE runtime applications.
 #
 # Unlike the `iree_compiler` target, this target actually builds the runtime
 # from source in toolchain/iree. The results of the build are placed in
-# out/springbok_iree.
+# out/kelvin_iree.
 #
 # In general, you probably want the `iree` target instead, which combines
 # `iree_compiler` and `iree_runtime`.
@@ -141,7 +139,7 @@ iree: iree_compiler iree_runtime
 #
 # Unlike the `iree_runtime` target, this target builds the runtime application
 # for internal models. The results of the build are placed in
-# out/springbok_iree_internal.
+# out/kelvin_iree_internal.
 #
 # In general, you probably want the `iree_runtime` target instead.
 iree_runtime_internal: $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja | \
@@ -154,30 +152,30 @@ iree_runtime_internal: $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja | \
 # applications.
 iree_internal: iree_compiler iree_runtime_internal
 
-## Installs the IREE runtime applications, built without WMMU support.
-iree_runtime_no_wmmu: $(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
-	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_NO_WMMU_OUT)
+## Installs the IREE runtime applications, with IREE stats printed.
+iree_runtime_stats: $(IREE_RUNTIME_STATS_OUT)/build.ninja | iree_check iree_commit_check
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_STATS_OUT)
 
-## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
-iree_no_wmmu: iree_compiler iree_runtime_no_wmmu
+## Installs the IREE compiler and its runtime applications with IREE stats, for single core testing.
+iree_stats: iree_compiler iree_runtime_stats
 
-## Installs the IREE runtime internal applications, built without WMMU support.
-iree_internal_runtime_no_wmmu: $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
-	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
+## Installs the IREE runtime internal applications, with IREE stats printed.
+iree_internal_runtime_stats: $(IREE_RUNTIME_INTERNAL_STATS_OUT)/build.ninja | iree_check iree_commit_check
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_INTERNAL_STATS_OUT)
 
-## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
-iree_internal_no_wmmu: iree_compiler iree_internal_runtime_no_wmmu
+## Installs the IREE compiler and its runtime applications with IREE stats, for single core testing.
+iree_internal_stats: iree_compiler iree_internal_runtime_stats
 
 ## Clean IREE compiler and runtime applications.
 iree_clean:
-	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT) $(IREE_RUNTIME_NO_WMMU_OUT)
+	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT) $(IREE_RUNTIME_STATS_OUT)
 
 ## Clean IREE compiler and runtime application of internal models
 iree_internal_clean:
-	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_INTERNAL_OUT) $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
+	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_INTERNAL_OUT) $(IREE_RUNTIME_INTERNAL_STATS_OUT)
 
 .PHONY:: iree iree_check iree_compiler iree_runtime iree_clean
 .PHONY:: iree_commit_check iree_compiler_src
 .PHONY:: iree_runtime_internal iree_internal iree_internal_clean
-.PHONY:: iree_runtime_no_wmmu iree_no_wmmu iree_internal_runtime_no_wmmu iree_internal_no_wmmu
+.PHONY:: iree_runtime_stats iree_stats iree_internal_runtime_stats iree_internal_stats
 .PHONY:: iree_model_builtins

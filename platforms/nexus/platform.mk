@@ -1,6 +1,7 @@
 include $(ROOTDIR)/build/platforms/nexus/boot_rom.mk
 include $(ROOTDIR)/build/platforms/nexus/cantrip.mk
 include $(ROOTDIR)/build/platforms/nexus/cantrip_builtins.mk
+include $(ROOTDIR)/build/platforms/nexus/iree.mk
 include $(ROOTDIR)/build/platforms/nexus/kelvin.mk
 include $(ROOTDIR)/build/platforms/nexus/opentitan_sw.mk
 include $(ROOTDIR)/build/platforms/nexus/opentitan_hw.mk
