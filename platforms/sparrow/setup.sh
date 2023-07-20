@@ -84,13 +84,22 @@ function sim_springbok
 
 function sim_kelvin
 {
-    local command="start;"
-    if [[ "$2" == "debug" ]]; then
-        command="machine StartGdbServer 3333;"
-    fi
+    # check input file to use kelvin_sim or renode wrapper
     local bin_file=$(realpath $1)
-    (cd "${ROOTDIR}" && renode -e "\$bin=@${bin_file}; i @sim/config/kelvin.resc; \
-    ${command} sysbus.vec_controlblock WriteDoubleWord 0xc 0" \
-        --disable-xwt --console)
-
+    local magic_bytes=$(xxd -p -l 4 "${bin_file}")
+    if [[ ${magic_bytes} == "7f454c46" ]]; then
+        local flag=""
+        if [[ "$2" == "debug" ]]; then
+            flag="-i"
+        fi
+        ("${OUT}/kelvin/sim/kelvin_sim" "${bin_file}" ${flag})
+    else
+        local command="start;"
+        if [[ "$2" == "debug" ]]; then
+            command="machine StartGdbServer 3333;"
+        fi
+        (cd "${ROOTDIR}" && renode -e "\$bin=@${bin_file}; i @sim/config/kelvin.resc; \
+        ${command} sysbus.vec_controlblock WriteDoubleWord 0xc 0" \
+            --disable-xwt --console)
+    fi
 }
