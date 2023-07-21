@@ -35,6 +35,7 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(CANTRIP_KERNEL_RELEASE)
 	ln -sf $(CANTRIP_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(CANTRIP_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle.bin kernel capdl-loader
+ext_flash_release: ${OUT}/ext_flash_release.tar
 
 # Dredge the platform configuration for the physical address where the
 # cpio archive is expected.
