@@ -36,6 +36,13 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(CANTRIP_KERNEL_RELEASE)
 	ln -sf $(CANTRIP_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle.bin kernel capdl-loader
 
+# Dredge the platform configuration for the physical address where the
+# cpio archive is expected.
+# NB: #define must be at the start of the line so any commented out
+#    copies are skipped
+CPIO_LOAD_ADDRESS=$(shell awk '/^#define[ \t]+CPIO_BASE_ADDR/ { print $$3 }' \
+    $(CANTRIP_SRC_DIR)/apps/system/platforms/sparrow/platform.camkes)
+
 # Renode commands to issue before the initial start of a simulation.
 # This pauses all cores and then sets cpu0 (SC) & cpu1 (SMC) running.
 RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false;
@@ -53,6 +60,7 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree_model_buil
 	$(RENODE_CMD) -e "\
     \$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; \
     \$$cpio = @$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio; \
+    \$$cpio_load_address = ${CPIO_LOAD_ADDRESS}; \
     $(PORT_PRESTART_CMDS) i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
 ## Debug version of the `simulate` target
@@ -65,6 +73,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_
     \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
+    \$$cpio_load_address = ${CPIO_LOAD_ADDRESS}; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateSeL4 0xffffffee; start"
 
@@ -79,6 +88,7 @@ debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_mode
     \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
+    \$$cpio_load_address = ${CPIO_LOAD_ADDRESS}; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; start"
 
