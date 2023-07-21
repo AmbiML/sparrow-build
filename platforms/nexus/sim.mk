@@ -51,8 +51,10 @@ PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(REN
 # need for day-to-day work on the software side of Sparrow.
 simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar kelvin_sw $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/nexus.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; \
     \$$cpio = @$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio; \
+    \$$cpio_load_address = 0x50380000; \
     $(PORT_PRESTART_CMDS) i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
 ## Debug version of the `simulate` target
@@ -65,6 +67,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar kelvin_sw $
     \$$repl_file = @sim/config/platforms/nexus-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
+    \$$cpio_load_address = 0x50380000; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateSeL4 0xffffffee; start"
 
@@ -79,6 +82,7 @@ debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar kelvin_sw
     \$$repl_file = @sim/config/platforms/nexus-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio; \
+    \$$cpio_load_address = 0x50380000; \
     \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; start"
 
@@ -99,21 +103,45 @@ $(OUT)/ext_flash_minisel_release.tar: $(MATCHA_BUNDLE_RELEASE) $(CANTRIP_KERNEL_
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_minisel_release.tar matcha-tock-bundle kernel capdl-loader
 
 simulate_minisel: renode $(OUT)/ext_flash_minisel_debug.tar
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_debug.tar; \$$kernel = @$(CANTRIP_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
-	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/nexus.repl; \
+    \$$tar = @$(ROOTDIR)/out/ext_flash_minisel_debug.tar; \
+    \$$kernel = @$(CANTRIP_KERNEL_DEBUG); \
+    $(PORT_PRESTART_CMDS) \
+    i @sim/config/sparrow.resc; \
+    $(RENODE_PRESTART_CMDS) \
+    start"
 
 simulate_minisel_release: renode $(OUT)/ext_flash_minisel_release.tar
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_release.tar; $(PORT_PRESTART_CMDS) \
-	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/nexus.repl; \
+    \$$tar = @$(ROOTDIR)/out/ext_flash_minisel_release.tar; \
+    \$$kernel = @$(CANTRIP_KERNEL_DEBUG); \
+    $(PORT_PRESTART_CMDS) \
+    i @sim/config/sparrow.resc; \
+    $(RENODE_PRESTART_CMDS) \
+    start"
 
 test_sc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/test_sc.tar; \
+    i @sim/config/sparrow.resc; \
+    $(RENODE_PRESTART_CMDS); \
+    start"
 
 test_mc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_mc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/test_mc.tar; \
+    i @sim/config/sparrow.resc; \
+    $(RENODE_PRESTART_CMDS); \
+    start"
 
 test_vc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_vc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/test_vc.tar; \
+    i @sim/config/sparrow.resc; \
+    $(RENODE_PRESTART_CMDS); \
+    start"
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
 .PHONY:: test_sc test_mc test_vc

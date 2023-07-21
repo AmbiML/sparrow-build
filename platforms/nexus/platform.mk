@@ -36,6 +36,23 @@ $(TIMER_HJSON): $(TIMER_NINJA) $(TIMER_TEMPLATE) | $(OPENTITAN_GEN_DIR)
 $(TIMER_HEADER): $(REGTOOL) $(TIMER_HJSON)
 	$(REGTOOL) -D -o $@ $(TIMER_HJSON)
 
+# Matcha hw config #defines generated from RTL
+
+TOP_MATCHA_DIR=${CANTRIP_OUT_DIR}/top_matcha
+TOP_MATCHA_MEMORY_HEADER=$(TOP_MATCHA_DIR)/sw/autogen/top_matcha_memory.h
+TOP_MATCHA_IRQ_HEADER=$(TOP_MATCHA_DIR)/sw/autogen/top_matcha_smc_irq.h
+# NB: could depend on the templates instead
+TOPGEN_MATCHA=${ROOTDIR}/hw/matcha/util/topgen_matcha.py
+
+${TOP_MATCHA_DIR}:
+	mkdir -p $(TOP_MATCHA_DIR)
+
+# NB: no way to generate just the files we need
+$(TOP_MATCHA_IRQ_HEADER): $(TOPGEN_MATCHA) ${TOP_MATCHA_DIR} $(TOP_MATCHA_HJSON)
+	PYTHONPATH=${OPENTITAN_SOURCE}/util/ ${TOPGEN_MATCHA} -t ${TOP_MATCHA_HJSON} -o ${TOP_MATCHA_DIR}/ --top-only
+$(TOP_MATCHA_MEMORY_HEADER): $(TOPGEN_MATCHA) ${TOP_MATCHA_DIR} $(TOP_MATCHA_HJSON)
+	PYTHONPATH=${OPENTITAN_SOURCE}/util/ ${TOPGEN_MATCHA} -t ${TOP_MATCHA_HJSON} -o ${TOP_MATCHA_DIR}/ --top-only
+
 # Targets to install the symlink to opentitan headers for each build
 
 cantrip-build-debug-prepare:: | $(CANTRIP_OUT_DEBUG)
@@ -56,8 +73,9 @@ sel4test-build-wrapper-release-prepare:: | $(SEL4TEST_WRAPPER_OUT_RELEASE)
 sel4test-build-wrapper-debug-prepare:: | $(SEL4TEST_WRAPPER_OUT_DEBUG)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_DEBUG)/
 
-cantrip-gen-headers:: $(TIMER_HEADER)
+cantrip-gen-headers:: $(TIMER_HEADER) $(TOP_MATCHA_IRQ_HEADER) $(TOP_MATCHA_MEMORY_HEADER)
 
 cantrip-clean-headers::
 	rm -f $(TIMER_HJSON)
 	rm -f $(TIMER_HEADER)
+	rm -f $(TOP_MATCHA_IRQ_HEADER) $(TOP_MATCHA_MEMORY_HEADER)
