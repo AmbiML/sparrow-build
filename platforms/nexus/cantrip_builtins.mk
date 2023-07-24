@@ -33,3 +33,9 @@ CANTRIP_APPS_DEBUG    := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
 CANTRIP_MODEL_DEBUG   := $(OUT)/kelvin/sw/bazel_out/hello_world.kelvin
 
 CANTRIP_SCRIPTS       := $(ROOTDIR)/build/platforms/$(PLATFORM)/builtins.repl
+
+# HACK(jtgans): Fix the IREE targets to explicitly list the files it generates.
+# TODO(hcindyl): Use IREE targets instead of hello_world once `kelvin_cleanup`
+# topic is merged
+$(patsubst %.kelvin,%,$(CANTRIP_MODEL_RELEASE)): kelvin_sw
+$(patsubst %.kelvin,%,$(CANTRIP_MODEL_DEBUG)): kelvin_sw
