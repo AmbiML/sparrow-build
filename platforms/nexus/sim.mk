@@ -20,6 +20,7 @@ clean_sim_configs:
 
 # NB: $(CANTRIP_ROOTSERVER_*) is built together with $(CANTRIP_KERNEL_*)
 
+# NB: debug builds are too big to run on Nexus so an ext_flash_debug target is pointless
 $(OUT)/ext_flash_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(CANTRIP_KERNEL_DEBUG) $(CANTRIP_ROOTSERVER_DEBUG) | $(OUT)/tmp
 	cp -f $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
 	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
@@ -35,7 +36,13 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(CANTRIP_KERNEL_RELEASE)
 	ln -sf $(CANTRIP_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(CANTRIP_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle.bin kernel capdl-loader
-ext_flash_release: ${OUT}/ext_flash_release.tar
+
+# NB: Package the builtins bundle so it can be written to a carveout in
+#     in SMC memory; this is temporary until the SEC supports returning
+#     the builtins from flash.
+ext_flash_release: ${OUT}/ext_flash_release.tar $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+	ln -sf $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio $(OUT)/tmp/cantrip-builtins
+	tar -C $(OUT)/tmp -rvhf $(OUT)/ext_flash_release.tar cantrip-builtins
 
 # Dredge the platform configuration for the physical address where the
 # cpio archive is expected.
