@@ -116,14 +116,4 @@ simulate_minisel_release: renode multihart_boot_rom $(OUT)/ext_flash_minisel_rel
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_release.tar; $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
-test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
-
-test_mc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_mc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
-
-test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_vc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
-
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
-.PHONY:: test_sc test_mc test_vc

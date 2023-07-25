@@ -130,26 +130,4 @@ simulate_minisel_release: renode $(OUT)/ext_flash_minisel_release.tar
     $(RENODE_PRESTART_CMDS) \
     start"
 
-test_sc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/test_sc.tar; \
-    i @sim/config/sparrow.resc; \
-    $(RENODE_PRESTART_CMDS); \
-    start"
-
-test_mc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/test_mc.tar; \
-    i @sim/config/sparrow.resc; \
-    $(RENODE_PRESTART_CMDS); \
-    start"
-
-test_vc: renode $(ROOTDIR)/sim/config/sparrow.resc
-	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/test_vc.tar; \
-    i @sim/config/sparrow.resc; \
-    $(RENODE_PRESTART_CMDS); \
-    start"
-
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
-.PHONY:: test_sc test_mc test_vc
