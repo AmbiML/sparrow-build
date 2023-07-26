@@ -26,10 +26,10 @@ $(SEL4TEST_OUT_DEBUG)/ext_flash.tar: $(MATCHA_BUNDLE_DEBUG) \
 	ln -sf $(SEL4TEST_ROOTSERVER_DEBUG) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle.bin kernel capdl-loader
 
-## Debug version of the `sel4test` target that stops very early to wait
-## for a debugger to be attached.
+## Launches the sel4test target with minimal modifications.
 sel4test: renode multihart_boot_rom $(SEL4TEST_OUT_DEBUG)/ext_flash.tar
 	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(SEL4TEST_OUT_DEBUG)/ext_flash.tar; \
     \$$kernel = @$(SEL4TEST_KERNEL_DEBUG); \
     \$$cpio = @/dev/null; \
@@ -53,6 +53,7 @@ $(SEL4TEST_WRAPPER_OUT_DEBUG)/ext_flash.tar: $(MATCHA_BUNDLE_DEBUG) \
 sel4test+wrapper: renode multihart_boot_rom \
 		$(SEL4TEST_WRAPPER_OUT_DEBUG)/ext_flash.tar
 	$(RENODE_CMD) -e "\
+    \$$repl_file = @sim/config/platforms/sparrow-debug.repl; \
     \$$tar = @$(SEL4TEST_WRAPPER_OUT_DEBUG)/ext_flash.tar; \
     \$$kernel = @$(SEL4TEST_KERNEL_DEBUG); \
     \$$cpio = @/dev/null; \
