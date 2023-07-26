@@ -20,7 +20,7 @@ CANTRIP_APPS_RELEASE  := $(CANTRIP_OUT_C_APP_RELEASE)/hello/hello.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app \
                          $(CANTRIP_OUT_C_APP_RELEASE)/suicide/suicide.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/timer/timer.app
-CANTRIP_MODEL_RELEASE := $(OUT)/kelvin/sw/bazel_out/hello_world.kelvin
+CANTRIP_MODEL_RELEASE := $(OUT)/kelvin_iree/sparrow_iree/samples/microbenchmarks/conv1x1_test_emitc_static.kelvin
 
 CANTRIP_APPS_DEBUG    := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/fibonacci/fibonacci.app \
@@ -30,12 +30,10 @@ CANTRIP_APPS_DEBUG    := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/panic/panic.app \
                          $(CANTRIP_OUT_C_APP_DEBUG)/suicide/suicide.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
-CANTRIP_MODEL_DEBUG   := $(OUT)/kelvin/sw/bazel_out/hello_world.kelvin
+CANTRIP_MODEL_DEBUG   := $(OUT)/kelvin_iree/sparrow_iree/samples/microbenchmarks/conv1x1_test_emitc_static.kelvin
 
 CANTRIP_SCRIPTS       := $(ROOTDIR)/build/platforms/$(PLATFORM)/builtins.repl
 
 # HACK(jtgans): Fix the IREE targets to explicitly list the files it generates.
-# TODO(hcindyl): Use IREE targets instead of hello_world once `kelvin_cleanup`
-# topic is merged
-$(patsubst %.kelvin,%,$(CANTRIP_MODEL_RELEASE)): kelvin_sw
-$(patsubst %.kelvin,%,$(CANTRIP_MODEL_DEBUG)): kelvin_sw
+$(patsubst %.kelvin,%,$(CANTRIP_MODEL_RELEASE)): iree_model_builtins
+$(patsubst %.kelvin,%,$(CANTRIP_MODEL_DEBUG)): iree_model_builtins

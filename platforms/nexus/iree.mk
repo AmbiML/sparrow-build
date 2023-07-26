@@ -104,7 +104,9 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_compiler iree_check iree_commit_check
 # IREE executables used in cantrip-builtins-*
 iree_model_builtins: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
 	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_OUT) --target \
-		quant_models/mobilenet_v1_emitc_static
+		sparrow_iree/samples/microbenchmarks/conv1x1_test_emitc_static
+	ln -sfn $(IREE_RUNTIME_OUT)/sparrow_iree/samples/microbenchmarks/conv1x1_test_emitc_static \
+		$(IREE_RUNTIME_OUT)/sparrow_iree/samples/microbenchmarks/conv1x1_test_emitc_static.elf
 
 $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_OUT) \

@@ -64,7 +64,7 @@ PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(REN
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar kelvin_sw $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree_model_builtins $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
     \$$repl_file = @sim/config/platforms/nexus.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; \
@@ -77,7 +77,7 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar kelvin_sw $(CAN
 # This top-level target does the same job as `simulate`, but instead of
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
-simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar kelvin_sw $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
     \$$repl_file = @sim/config/platforms/nexus-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
@@ -92,7 +92,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar kelvin_sw $
 # unhalting the CPUs and starting the system, this alternate target starts
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
-debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar kelvin_sw $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 	$(RENODE_CMD) -e "\
     \$$repl_file = @sim/config/platforms/nexus-debug.repl; \
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
