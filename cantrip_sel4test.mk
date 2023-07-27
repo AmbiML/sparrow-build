@@ -14,7 +14,7 @@
 
 # Location of sel4test sources and binary output files
 SEL4TEST_SRC_DIR  := $(ROOTDIR)/cantrip/projects/sel4test
-SEL4TEST_OUT_DIR := $(OUT)/sel4test/$(CANTRIP_TARGET_ARCH)
+SEL4TEST_OUT_DIR := $(OUT)/sel4test/$(PLATFORM)
 SEL4TEST_OUT_DEBUG := $(SEL4TEST_OUT_DIR)/debug
 SEL4TEST_KERNEL_DEBUG := $(SEL4TEST_OUT_DEBUG)/kernel/kernel.elf
 SEL4TEST_ROOTSERVER_DEBUG := $(SEL4TEST_OUT_DEBUG)/apps/sel4test-driver/sel4test-driver
@@ -82,7 +82,7 @@ sel4test-clean:
 # sel4test build machinery whenever possible.
 
 SEL4TEST_WRAPPER_LIBRARY_DIR := $(SEL4TEST_SRC_DIR)/integrations/sel4-sys-wrapper
-SEL4TEST_WRAPPER_OUT_DIR := $(OUT)/sel4test-wrapper/$(CANTRIP_TARGET_ARCH)
+SEL4TEST_WRAPPER_OUT_DIR := $(OUT)/sel4test-wrapper/$(PLATFORM)
 SEL4TEST_WRAPPER_OUT_DEBUG := $(SEL4TEST_WRAPPER_OUT_DIR)/debug
 SEL4TEST_WRAPPER_ROOTSERVER_DEBUG := $(SEL4TEST_WRAPPER_OUT_DEBUG)/apps/sel4test-driver/sel4test-driver
 

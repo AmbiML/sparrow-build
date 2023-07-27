@@ -22,6 +22,9 @@ CANTRIP_MODEL_RELEASE  :=
 CANTRIP_MODEL_DEBUG    :=
 CANTRIP_SCRIPTS        :=
 
+EXT_BUILTINS_DEBUG=$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+EXT_BUILTINS_RELEASE=$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+
 # TODO(jtgans): should include from platforms/${PLATFORM}/platform.mk
 include $(ROOTDIR)/build/platforms/$(PLATFORM)/cantrip_builtins.mk
 
@@ -38,16 +41,16 @@ $(CANTRIP_OUT_DEBUG)/builtins: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CA
 	mkdir -p $@
 	cp $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS} $@
 
-$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio: $(CANTRIP_OUT_RELEASE)/builtins
+$(EXT_BUILTINS_RELEASE): $(CANTRIP_OUT_RELEASE)/builtins
 	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
 
-$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio: $(CANTRIP_OUT_DEBUG)/builtins
+$(EXT_BUILTINS_DEBUG): $(CANTRIP_OUT_DEBUG)/builtins
 	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
 
 ## Generates cpio archive of Cantrip builtins with debugging suport
-cantrip-builtins-debug: $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+cantrip-builtins-debug: $(EXT_BUILTINS_DEBUG)
 ## Generates cpio archive of Cantrip builtins for release
-cantrip-builtins-release: $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+cantrip-builtins-release: $(EXT_BUILTINS_RELEASE)
 ## Generates both debug & release cpio archives of Cantrip builtins
 cantrip-builtins: cantrip-builtins-debug cantrip-builtins-release
 

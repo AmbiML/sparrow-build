@@ -12,8 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-sim_configs::
-clean_sim_configs::
+# Location of pre-loaded memory image for qemu
+QEMU_MEM_DEBUG=$(CANTRIP_OUT_DEBUG)/cantrip.mem
+QEMU_MEM_RELEASE=$(CANTRIP_OUT_RELEASE)/cantrip.mem
+
+# Location of capdl-loader setup for qemu
+QEMU_CAPDL_LOADER_DEBUG=$(CANTRIP_OUT_DEBUG)/capdl-loader-image
+QEMU_CAPDL_LOADER_RELEASE=$(CANTRIP_OUT_RELEASE)/capdl-loader-image
+
+# Dredge the platform configuration for the cpio archive splat into
+# the $QEMU_MEM_* memory image.
+# NB: #define must be at the start of the line so any commented out
+#    copies are skipped
+CPIO_SIZE=$(shell awk '\
+				/^#define[ \t]+CPIO_SIZE_BYTES/ { print strtonum($$3) / (1024*1024) "M" } \
+    ' $(CANTRIP_SRC_DIR)/apps/system/platforms/bcm2837/platform.camkes)
+CPIO_SEEK=$(shell awk '\
+				/^#define[ \t]+CPIO_BASE_ADDR/ { print strtonum($$3) / (1024*1024) } \
+		' $(CANTRIP_SRC_DIR)/apps/system/platforms/bcm2837/platform.camkes)
 
 # qemu fixes the memory size according to the machine type. If you use
 # other than the default you also need to adjust CPIO_BASE_ADDR in the
@@ -36,67 +52,57 @@ QEMU_CMD := ${QEMU} -machine ${QEMU_MACHINE} -nographic -serial null \
 qemu_presence_check:
 	@${QEMU} --version >/dev/null
 
+sim_configs::
+clean_sim_configs::
+
 ## Launches an end-to-end build of the Sparrow system and starts qemu
 #
-# This top-level target triggers building the entire system and then starting
+# This top-level target triggers building the entire system and then starts
 # the qemu simulator with the build artifacts.
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: ${CANTRIP_OUT_RELEASE}/capdl-loader-image ${CANTRIP_OUT_RELEASE}/cantrip.mem | qemu_presence_check
-	$(QEMU_CMD) \
-	-kernel ${CANTRIP_OUT_RELEASE}/capdl-loader-image \
-	--mem-path ${CANTRIP_OUT_RELEASE}/cantrip.mem
+simulate: qemu-capdl-loader-release qemu-mem-release | qemu_presence_check
+	$(QEMU_CMD) -kernel ${QEMU_CAPDL_LOADER_RELEASE} --mem-path ${QEMU_MEM_RELEASE}
 
-$(CANTRIP_OUT_RELEASE)/capdl-loader-image: $(CANTRIP_KERNEL_RELEASE) \
+$(QEMU_CAPDL_LOADER_RELEASE): $(CANTRIP_KERNEL_RELEASE) \
 		$(CANTRIP_ROOTSERVER_RELEASE) ${CANTRIP_OUT_RELEASE}/elfloader/elfloader
 	${C_PREFIX}objcopy -O binary ${CANTRIP_OUT_RELEASE}/elfloader/elfloader $@
+qemu-capdl-loader-release: ${QEMU_CAPDL_LOADER_RELEASE}
 
-# XXX no dep on system.camkes
-$(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio \
+$(QEMU_MEM_RELEASE): cantrip-builtins-release \
 		${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h \
     $(ROOTDIR)/build/platforms/rpi3/sim.mk \
     ${CANTRIP_SRC_DIR}/apps/system/platforms/bcm2837/system.camkes
 	dd if=/dev/zero of=$@ bs=${MEMORY_SIZE} count=1
-	SEL4_PLATFORM=$$(awk '\
-		/\<CONFIG_PLAT\>/ { print $$3 } \
-	' ${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h) && \
-	DD_ARGS=$$(awk ' \
-        /^#define[ ]+CPIO_SIZE_BYTES/ { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
-        /^#define[ ]+CPIO_BASE_ADDR/ { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
-	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/platform.camkes) && \
-	dd if=$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
+	dd if=$(EXT_BUILTINS_RELEASE) of=$@ \
+			ibs=${CPIO_SIZE} obs=1M seek=${CPIO_SEEK} conv=sync,nocreat,notrunc
+qemu-mem-release: $(QEMU_MEM_RELEASE)
 
 ## Debug version of the `simulate` target
-simulate-debug: ${CANTRIP_OUT_DEBUG}/cantrip.mem ${CANTRIP_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
-	$(QEMU_CMD) -s \
-	-kernel ${CANTRIP_OUT_DEBUG}/capdl-loader-image \
-	--mem-path ${CANTRIP_OUT_DEBUG}/cantrip.mem
+simulate-debug: qemu-capdl-loader-debug qemu-mem-debug | qemu_presence_check
+	$(QEMU_CMD) -s -kernel ${QEMU_CAPDL_LOADER_DEBUG} --mem-path ${QEMU_MEM_DEBUG}
 
-$(CANTRIP_OUT_DEBUG)/capdl-loader-image: $(CANTRIP_KERNEL_DEBUG) $(CANTRIP_ROOTSERVER_DEBUG) ${CANTRIP_OUT_DEBUG}/elfloader/elfloader
+$(QEMU_CAPDL_LOADER_DEBUG): $(CANTRIP_KERNEL_DEBUG) \
+		$(CANTRIP_ROOTSERVER_DEBUG) ${CANTRIP_OUT_DEBUG}/elfloader/elfloader
 	${C_PREFIX}objcopy -O binary ${CANTRIP_OUT_DEBUG}/elfloader/elfloader $@
+qemu-capdl-loader-debug: ${QEMU_CAPDL_LOADER_RELEASE}
 
-# XXX no dep on system.camkes
-$(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h
+$(QEMU_MEM_DEBUG): cantrip-builtins-debug \
+    ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h \
+    $(ROOTDIR)/build/platforms/rpi3/sim.mk \
+    ${CANTRIP_SRC_DIR}/apps/system/platforms/bcm2837/system.camkes
 	dd if=/dev/zero of=$@ bs=${MEMORY_SIZE} count=1
-	SEL4_PLATFORM=$$(awk '\
-		/\<CONFIG_PLAT\>/ { print $$3 } \
-	' ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h) && \
-	DD_ARGS=$$(awk ' \
-        /cpio.cpio_size = / { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
-        /cpio.cpio_paddr = / { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
-	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/system.camkes) && \
-	dd if=$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
+	dd if=$(EXT_BUILTINS_DEBUG) of=$@ \
+			ibs=${CPIO_SIZE} obs=1M seek=${CPIO_SEEK} conv=sync,nocreat,notrunc
+qemu-mem-debug: $(QEMU_MEM_DEBUG)
 
 ## Debug version of the `simulate` target
 #
 # This top-level target does the same job as `simulate-debug`, but instead of
-# unhalting the CPUs and starting the system, this alternate target starts
-# renode with no CPUs unhalted, allowing for GDB to be used for early system
-# start.
-debug-simulation: ${CANTRIP_OUT_DEBUG}/cantrip.mem ${CANTRIP_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
-	$(QEMU_CMD) -s -S \
-	-kernel ${CANTRIP_OUT_DEBUG}/capdl-loader-image \
-	--mem-path ${CANTRIP_OUT_DEBUG}/cantrip.mem
+# unhalting the CPU and starting the system, this alternate target
+# allows for GDB to be used for early system debugging.
+debug-simulation: qemu-capdl-loader-debug qemu-mem-debug | qemu_presence_check
+	$(QEMU_CMD) -s -S -kernel ${QEMU_CAPDL_LOADER_DEBUG} --mem-path ${QEMU_MEM_DEBUG}
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation

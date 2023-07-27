@@ -8,6 +8,9 @@ include $(ROOTDIR)/build/platforms/nexus/opentitan_hw.mk
 include $(ROOTDIR)/build/platforms/nexus/renode.mk
 include $(ROOTDIR)/build/platforms/nexus/matcha_hw.mk
 include $(ROOTDIR)/build/platforms/nexus/tock.mk
+
+
+# Put simulation targets at the end
 include $(ROOTDIR)/build/platforms/nexus/sim.mk
 include $(ROOTDIR)/build/platforms/nexus/sim_sel4test.mk
 
