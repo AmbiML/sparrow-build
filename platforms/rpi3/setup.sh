@@ -48,5 +48,3 @@ else
     export RUSTUP_HOME="${RUSTDIR}"
     export PATH="${RUSTDIR}/bin:${PATH}"
 fi
-
-export CANTRIP_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"

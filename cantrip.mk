@@ -33,7 +33,7 @@ CARGO_CMD         := cargo +$(CANTRIP_RUST_VERSION)
 # Location of seL4 kernel source (for sel4-sys)
 SEL4_KERNEL_DIR  := $(ROOTDIR)/cantrip/kernel
 
-# CANTRIP_OUT_DIR is defined in build/platform/$PLATFORM/setup.sh
+# CANTRIP_OUT_DIR is defined in build/setup.sh
 CANTRIP_OUT_DEBUG   := $(CANTRIP_OUT_DIR)/debug
 CANTRIP_OUT_RELEASE := $(CANTRIP_OUT_DIR)/release
 

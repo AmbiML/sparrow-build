@@ -179,20 +179,19 @@ function set-platform
     fi
 
     export PLATFORM="${platform}"
+    export CANTRIP_OUT_DIR="${OUT}/cantrip/${PLATFORM}"
     source "${ROOTDIR}/build/platforms/${platform}/setup.sh"
 }
 
 function kcargo
 {
-    local CANTRIP_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"
-
     # NB: sel4-config needs a path to the kernel build which could be
     #     in debug or release (for our needs either works)
     local SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/debug/kernel/"
     if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
         SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/release/kernel/"
         if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
-            echo "No kernel build found at \${SEL4_OUT_DIR}; build a kernel first"
+            echo "No kernel build found at ${SEL4_OUT_DIR}; build a kernel first"
             set +x
             return 1
         fi

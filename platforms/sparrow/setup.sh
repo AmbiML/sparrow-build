@@ -29,7 +29,6 @@ export CARGO_HOME="${RUSTDIR}"
 export RUSTUP_HOME="${RUSTDIR}"
 export PATH="${RUSTDIR}/bin:${PATH}"
 
-export CANTRIP_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"
 export OPENTITAN_GEN_DIR="${CANTRIP_OUT_DIR}/opentitan-gen/include/opentitan"
 export OPENTITAN_SOURCE="${ROOTDIR}/hw/opentitan-upstream"
 
