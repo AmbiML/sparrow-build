@@ -48,9 +48,10 @@ $(KELVIN_SIM_OUT_DIR):
 ## Build Kelvin ISS
 #
 # Build mpact-sim-based Kelvin ISS with bazel, and copy it to out/
+# Use /tmp as the bazel tmpfs to unblock CI
 kelvin_sim: | $(KELVIN_SIM_OUT_DIR)
 	cd "$(KELVIN_SIM_SRC_DIR)" && \
-		bazel build //sim:kelvin_sim
+		bazel build --sandbox_tmpfs_path=/tmp //sim:kelvin_sim
 	cd "$(KELVIN_SIM_SRC_DIR)/bazel-bin" && \
 		cp -f sim/kelvin_sim "$(KELVIN_SIM_OUT_DIR)"
 
