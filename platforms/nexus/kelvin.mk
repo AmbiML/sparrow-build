@@ -9,8 +9,7 @@ KELVIN_SIM_SRC_DIR := $(ROOTDIR)/sim/kelvin
 KELVIN_SIM_OUT_DIR := $(OUT)/kelvin/sim
 
 
-$(KELVIN_SW_OUT_DIR):
-	mkdir -p "$(KELVIN_SW_OUT_DIR)"
+$(KELVIN_SW_BAZEL_OUT_DIR):
 	mkdir -p "$(KELVIN_SW_BAZEL_OUT_DIR)"
 
 $(KELVIN_SW_TESTLOG_DIR):
@@ -19,7 +18,7 @@ $(KELVIN_SW_TESTLOG_DIR):
 ## Build Kelvin SW artifacts
 #
 # Some of the artifacts are built with bazel, and need to be copied to out/
-kelvin_sw: | $(KELVIN_SW_OUT_DIR)
+kelvin_sw: | $(KELVIN_SW_BAZEL_OUT_DIR)
 	cd "$(KELVIN_SW_SRC_DIR)" && \
 		bazel build //...
 	cd "$(KELVIN_SW_SRC_DIR)/bazel-out" && \
