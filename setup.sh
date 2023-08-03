@@ -242,6 +242,8 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     JUMP_TARGETS[build]="${ROOTDIR}/build"
     JUMP_TARGETS[doc]="${ROOTDIR}/doc"
 
+    JUMP_TARGETS[sel4]="${ROOTDIR}/cantrip/kernel"
+    JUMP_TARGETS[kernel]="${ROOTDIR}/cantrip/kernel"
     JUMP_TARGETS[cantrip]="${ROOTDIR}/cantrip/projects/cantrip"
     JUMP_TARGETS[system]="${ROOTDIR}/cantrip/projects/cantrip/apps/system"
     JUMP_TARGETS[c-apps]="${ROOTDIR}/cantrip/projects/cantrip/apps/c"
@@ -251,6 +253,7 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     JUMP_TARGETS[release]="${CANTRIP_OUT_DIR}/release"
 
     JUMP_TARGETS[tock]="${ROOTDIR}/sw/tock"
+    JUMP_TARGETS[sim]="${ROOTDIR}/sim"
 
     function j
     {
