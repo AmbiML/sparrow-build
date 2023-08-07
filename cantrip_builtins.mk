@@ -31,12 +31,22 @@ include $(ROOTDIR)/build/platforms/$(PLATFORM)/cantrip_builtins.mk
 CPIO ?= cpio
 BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=root:root
 
-$(CANTRIP_OUT_RELEASE)/builtins: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS}
+$(CANTRIP_OUT_RELEASE)/builtins: \
+  $(CANTRIP_APPS_RELEASE) \
+  $(CANTRIP_MODEL_RELEASE) \
+  ${CANTRIP_SCRIPTS} \
+  ${ROOTDIR}/build/cantrip_builtins.mk \
+  ${ROOTDIR}/build/platforms/${PLATFORM}/cantrip_builtins.mk
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS} $@
 
-$(CANTRIP_OUT_DEBUG)/builtins: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS}
+$(CANTRIP_OUT_DEBUG)/builtins: \
+  $(CANTRIP_APPS_DEBUG) \
+  $(CANTRIP_MODEL_DEBUG) \
+  ${CANTRIP_SCRIPTS} \
+  ${ROOTDIR}/build/cantrip_builtins.mk \
+  ${ROOTDIR}/build/platforms/${PLATFORM}/cantrip_builtins.mk
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS} $@
