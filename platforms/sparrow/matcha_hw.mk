@@ -16,6 +16,8 @@ MATCHA_SRC_DIR             := $(ROOTDIR)/hw/matcha
 MATCHA_OUT_DIR             := $(OUT)/matcha/hw
 MATCHA_VERILATOR_TB        := $(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb
 MATCHA_TESTLOG_DIR         := $(MATCHA_OUT_DIR)/test-log
+MATCHA_FPGA_BINARY_DIR     := $(MATCHA_OUT_DIR)/fpga_tests
+MATCHA_FPGA_KELVIN_BINARY_DIR := $(MATCHA_FPGA_BINARY_DIR)/kelvin
 
 $(MATCHA_OUT_DIR):
 	mkdir -p $(MATCHA_OUT_DIR)
@@ -71,7 +73,31 @@ $(MATCHA_TESTLOG_DIR):
 #
 matcha_sw_all:
 	cd $(MATCHA_SRC_DIR) && \
-	  bazel build --define DISABLE_VERILATOR_BUILD=true //sw/device/...
+	  bazel build --define DISABLE_VERILATOR_BUILD=true --build_tag_filters="-kelvin_fpga" \
+			//sw/device/...
+
+
+$(MATCHA_FPGA_KELVIN_BINARY_DIR):
+	mkdir -p "$(MATCHA_FPGA_KELVIN_BINARY_DIR)"
+
+
+## Build Matcha Kelvin SW FPGA test artifacts
+#
+# Build kelvin artifacts and package it in a tarball and ready for use on the FPGA
+# The output is at out/matcha/hw/fpga_tests/kelvin
+#
+matcha_kelvin_fpga_tarballs: kelvin_sw | $(MATCHA_FPGA_KELVIN_BINARY_DIR)
+	cd $(MATCHA_SRC_DIR) && \
+	  bazel build --define DISABLE_VERILATOR_BUILD=true \
+			//sw/device/tests/kelvin/fpga_tests/...
+# Copy the tarballs and sc binary to out/.
+	cd $(MATCHA_SRC_DIR) && \
+		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests/kelvin/fpga_tests/kelvin_test_sc_extflash_fpga_nexus.bin" |\
+			xargs -I {} cp -f {} "$(MATCHA_FPGA_KELVIN_BINARY_DIR)"
+	cd $(MATCHA_SRC_DIR) && \
+		find "bazel-bin/sw/device/tests/kelvin/fpga_tests" -name "*.tar" |\
+			xargs -I {} cp -f {} "$(MATCHA_FPGA_KELVIN_BINARY_DIR)"
+
 
 ## Build opentitantool for matcha FPGA tests
 opentitantool_pkg: | $(MATCHA_OUT_DIR)
@@ -98,4 +124,4 @@ matcha_hw_clean:
 
 .PHONY:: matcha_hw_verilator_sim matcha_hw_clean matcha_hw_verilator_tests
 .PHONY:: matcha_sw_all opentitantool_pkg
-.PHONY:: matcha_hw_fpga_nexus
+.PHONY:: matcha_hw_fpga_nexus matcha_kelvin_fpga_tarballs
