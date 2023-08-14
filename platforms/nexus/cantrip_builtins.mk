@@ -35,5 +35,5 @@ CANTRIP_MODEL_DEBUG   := $(OUT)/kelvin_iree/sparrow_iree/samples/microbenchmarks
 CANTRIP_SCRIPTS       := $(ROOTDIR)/build/platforms/$(PLATFORM)/builtins.repl
 
 # HACK(jtgans): Fix the IREE targets to explicitly list the files it generates.
-$(patsubst %.kelvin,%,$(CANTRIP_MODEL_RELEASE)): iree_model_builtins
-$(patsubst %.kelvin,%,$(CANTRIP_MODEL_DEBUG)): iree_model_builtins
+$(CANTRIP_MODEL_RELEASE): iree_model_builtins
+$(CANTRIP_MODEL_DEBUG): iree_model_builtins
