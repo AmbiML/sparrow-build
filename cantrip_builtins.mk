@@ -51,11 +51,26 @@ $(CANTRIP_OUT_DEBUG)/builtins: \
 	mkdir -p $@
 	cp $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS} $@
 
+# Dredge platform config for space allocated to hold builtins bundle;
+# this is used below to check the constructed bundle fits.
+CPIO_SIZE_BYTES=$(shell awk '/^#define[ \t]+CPIO_SIZE_BYTES/ { print strtonum($$3) }' \
+    $(CANTRIP_SRC_DIR)/apps/system/platforms/${PLATFORM}/platform.camkes)
+
 $(EXT_BUILTINS_RELEASE): $(CANTRIP_OUT_RELEASE)/builtins
 	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
+	builtins_size=$$(ls -l $@ | awk '{ print $$5; }'); \
+	test "$${builtins_size}" -gt "${CPIO_SIZE_BYTES}" && {\
+	  echo "Builtins bundle too big: $${builtins_size} > ${CPIO_SIZE_BYTES}"; \
+	  exit 1; \
+	} || { exit 0; }
 
 $(EXT_BUILTINS_DEBUG): $(CANTRIP_OUT_DEBUG)/builtins
 	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
+	builtins_size=$$(ls -l $@ | awk '{ print $$5; }'); \
+	test "$${builtins_size}" -gt "${CPIO_SIZE_BYTES}" && {\
+	  echo "Builtins bundle too big: $${builtins_size} > ${CPIO_SIZE_BYTES}"; \
+	  exit 1; \
+	} || { exit 0; }
 
 ## Generates cpio archive of Cantrip builtins with debugging suport
 cantrip-builtins-debug: $(EXT_BUILTINS_DEBUG)
