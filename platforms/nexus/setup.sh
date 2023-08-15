@@ -40,6 +40,7 @@ export MBOX_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/tlul_mailbox/data/tlul_
 export ML_TOP_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/ml_top/data/ml_top.hjson"
 export TIMER_HJSON="${OPENTITAN_GEN_DIR}/rv_timer.hjson"
 export UART_HJSON="${OPENTITAN_SOURCE}/hw/ip/uart/data/uart.hjson"
+export VC_TOP_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/vc_top/data/vc_top.hjson"
 # Input for topgen_matcha.py to generate hw configuration
 export TOP_MATCHA_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/data/top_matcha.hjson"
 
