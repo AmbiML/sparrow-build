@@ -27,6 +27,18 @@ kelvin_sw: | $(KELVIN_SW_BAZEL_OUT_DIR)
 			-wholename "*ST-*/*.bin" \) \
 			-exec cp -f {} "$(KELVIN_SW_BAZEL_OUT_DIR)/" \;
 
+## Build Kelvin hello_world artifacts
+#
+# Used as the simplest Kelvin SW that has all the syntax CantripOS expects
+kelvin_hello_world: | $(KELVIN_SW_BAZEL_OUT_DIR)
+	cd "$(KELVIN_SW_SRC_DIR)" && \
+		bazel build //examples/hello_world:all; \
+		cd bazel-out ; find . -type f \( \
+			-wholename "*ST-*/*.elf" -o \
+			-wholename "*ST-*/*.bin" \) \
+			-exec cp -f {} "$(KELVIN_SW_BAZEL_OUT_DIR)/" \;
+
+
 ## Test Kelvin SW artifacts
 #
 # Test Kelvin SW artifacts with kelvin ISS simulation
@@ -62,5 +74,5 @@ kelvin_sim_clean:
 		bazel clean --expunge
 	rm -rf $(KELVIN_SIM_OUT_DIR)
 
-PHONY:: kelvin_sw kelvin_sw_clean kelvin_sw_test
+PHONY:: kelvin_sw kelvin_sw_clean kelvin_sw_test kelvin_hello_world
 PHONY:: kelvin_sim kelvin_sim_clean

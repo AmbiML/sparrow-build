@@ -76,7 +76,7 @@ PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(REN
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: renode multihart_boot_rom ext_flash_release iree_model_builtins cantrip-builtins-release
+simulate: renode multihart_boot_rom ext_flash_release kelvin_hello_world cantrip-builtins-release
 	$(RENODE_CMD) -e "\
     \$$repl_file = @sim/config/platforms/nexus.repl; \
     \$$tar = @$(EXT_FLASH_RELEASE); \

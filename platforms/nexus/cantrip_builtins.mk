@@ -36,5 +36,5 @@ CANTRIP_MODEL_DEBUG   := $(OUT)/kelvin_iree/sparrow_iree/samples/microbenchmarks
 
 CANTRIP_SCRIPTS       := $(ROOTDIR)/build/platforms/$(PLATFORM)/builtins.repl
 
-$(patsubst %.kelvin,%.elf,$(CANTRIP_MODEL_RELEASE)): kelvin_sw
+$(patsubst %.kelvin,%.elf,$(CANTRIP_MODEL_RELEASE)): kelvin_hello_world
 $(CANTRIP_MODEL_DEBUG): iree_model_builtins
