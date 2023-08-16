@@ -5,11 +5,6 @@ KELVIN_SW_OUT_DIR := $(OUT)/kelvin/sw
 KELVIN_SW_BAZEL_OUT_DIR := $(KELVIN_SW_OUT_DIR)/bazel_out
 KELVIN_SW_TESTLOG_DIR := $(KELVIN_SW_OUT_DIR)/bazel_testlog
 
-KELVIN_HW_SRC_DIR := $(ROOTDIR)/hw/kelvin
-KELVIN_HW_OUT_DIR := $(OUT)/kelvin/hw
-KELVIN_HW_BAZEL_OUT_DIR := $(KELVIN_HW_OUT_DIR)/bazel_out
-KELVIN_HW_TESTLOG_DIR := $(KELVIN_HW_OUT_DIR)/bazel_testlog
-
 KELVIN_SIM_SRC_DIR := $(ROOTDIR)/sim/kelvin
 KELVIN_SIM_OUT_DIR := $(OUT)/kelvin/sim
 
@@ -46,36 +41,6 @@ kelvin_sw_clean:
 	cd "$(KELVIN_SW_SRC_DIR)" && bazel clean --expunge
 
 
-$(KELVIN_HW_BAZEL_OUT_DIR):
-	mkdir -p "$(KELVIN_HW_BAZEL_OUT_DIR)"
-
-$(KELVIN_HW_TESTLOG_DIR):
-	mkdir -p "$(KELVIN_HW_TESTLOG_DIR)"
-
-## Verilog Source for Kelvin
-kelvin_hw_verilog: | $(KELVIN_HW_OUT_DIR)
-	cd "$(KELVIN_HW_SRC_DIR)" && \
-		bazel build //hdl/chisel:kelvin_cc_library_emit_verilog && \
-		cp bazel-bin/hdl/chisel/Kelvin.v "$(KELVIN_HW_BAZEL_OUT_DIR)"
-
-## Verilated Kelvin HW simulator
-kelvin_hw_sim: | $(KELVIN_HW_OUT_DIR)
-	cd "$(KELVIN_HW_SRC_DIR)" && \
-		bazel build //tests/verilator_sim:core_sim && \
-		cp bazel-bin/tests/verilator_sim/core_sim "$(KELVIN_HW_BAZEL_OUT_DIR)"
-
-## Tests for Kelvin HW
-kelvin_hw_test: | $(KELVIN_HW_TESTLOG_DIR)
-	cd "$(KELVIN_HW_SRC_DIR)"; \
-		bazel test --test_output=errors //... ; \
-		cp -rf bazel-testlogs/tests "$(KELVIN_HW_TESTLOG_DIR)"
-
-## Clean Kelvin HW artifacts
-kelvin_hw_clean:
-	rm -rf "$(KELVIN_HW_OUT_DIR)"
-	cd "$(KELVIN_HW_SRC_DIR)" && bazel clean --expunge
-
-
 $(KELVIN_SIM_OUT_DIR):
 	mkdir -p "$(KELVIN_SIM_OUT_DIR)"
 
@@ -97,6 +62,5 @@ kelvin_sim_clean:
 		bazel clean --expunge
 	rm -rf $(KELVIN_SIM_OUT_DIR)
 
-PHONY:: kelvin_hw_clean kelvin_hw_sim kelvin_hw_test kelvin_hw_verilog
 PHONY:: kelvin_sw kelvin_sw_clean kelvin_sw_test
 PHONY:: kelvin_sim kelvin_sim_clean
