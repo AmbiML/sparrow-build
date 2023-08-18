@@ -53,10 +53,13 @@ $(KELVIN_HW_TESTLOG_DIR):
 	mkdir -p "$(KELVIN_HW_TESTLOG_DIR)"
 
 ## Verilog Source for Kelvin
+#
+# This generates the kelvin.v file that can be used to update hw/matcha
 kelvin_hw_verilog: | $(KELVIN_HW_BAZEL_OUT_DIR)
 	cd "$(KELVIN_HW_SRC_DIR)" && \
-		bazel build //hdl/chisel:kelvin_cc_library_emit_verilog && \
-		cp -rf bazel-bin/hdl/chisel/Kelvin.v "$(KELVIN_HW_BAZEL_OUT_DIR)"
+		bazel clean --expunge && \
+			bazel build //hdl/chisel:matcha_kelvin_verilog && \
+		cp -rf bazel-bin/hdl/chisel/kelvin.v "$(KELVIN_HW_BAZEL_OUT_DIR)"
 
 ## Verilated Kelvin HW simulator
 kelvin_hw_sim: | $(KELVIN_HW_BAZEL_OUT_DIR)
