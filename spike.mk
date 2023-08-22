@@ -23,7 +23,9 @@ $(SPIKE_INSTALL_DIR):
 	mkdir -p $(SPIKE_INSTALL_DIR)
 
 $(SPIKE_INSTALL_DIR)/bin/spike: $(SPIKE_SRC_DIR) | $(SPIKE_BUILD_DIR) $(SPIKE_INSTALL_DIR)
-	cd $(SPIKE_BUILD_DIR) && $(SPIKE_SRC_DIR)/configure --prefix=$(SPIKE_INSTALL_DIR) \
+	cd $(SPIKE_BUILD_DIR) && \
+	CC=gcc-11 CXX=g++-11 \
+	$(SPIKE_SRC_DIR)/configure --prefix=$(SPIKE_INSTALL_DIR) \
 		--with-isa=rv32imafcv1p0_xspringbok --with-target=riscv32-unknown-elf \
 		--enable-commitlog
 	$(MAKE) -C $(SPIKE_BUILD_DIR) install
