@@ -36,8 +36,8 @@ kelvin_sw: | $(KELVIN_SW_BAZEL_OUT_DIR)
 #
 # Test Kelvin SW artifacts with kelvin ISS simulation
 kelvin_sw_test: kelvin_sim | $(KELVIN_SW_TESTLOG_DIR)
-	cd "$(KELVIN_SW_SRC_DIR)"; \
-		bazel test --test_output=errors //... ; \
+	cd "$(KELVIN_SW_SRC_DIR)" && \
+		bazel test --test_output=errors //... && \
 		cp -rf bazel-testlogs/tests "$(KELVIN_SW_TESTLOG_DIR)"
 
 ## Clean Kelvin SW artifacts
@@ -69,8 +69,8 @@ kelvin_hw_sim: | $(KELVIN_HW_BAZEL_OUT_DIR)
 
 ## Tests for Kelvin HW
 kelvin_hw_test: | $(KELVIN_HW_TESTLOG_DIR)
-	cd "$(KELVIN_HW_SRC_DIR)"; \
-		bazel test --test_output=errors //... ; \
+	cd "$(KELVIN_HW_SRC_DIR)" && \
+		bazel test --test_output=errors //... && \
 		cp -rf bazel-testlogs/tests "$(KELVIN_HW_TESTLOG_DIR)"
 
 ## Clean Kelvin HW artifacts

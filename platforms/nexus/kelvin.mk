@@ -37,7 +37,7 @@ kelvin_sw: | $(KELVIN_SW_BAZEL_OUT_DIR)
 # Used as the simplest Kelvin SW that has all the syntax CantripOS expects
 kelvin_hello_world: | $(KELVIN_SW_BAZEL_OUT_DIR)
 	cd "$(KELVIN_SW_SRC_DIR)" && \
-		bazel build //examples/hello_world:all; \
+		bazel build //examples/hello_world:all && \
 		cd bazel-out ; find . -type f \( \
 			-wholename "*ST-*/*.elf" -o \
 			-wholename "*ST-*/*.bin" \) \
@@ -48,8 +48,8 @@ kelvin_hello_world: | $(KELVIN_SW_BAZEL_OUT_DIR)
 #
 # Test Kelvin SW artifacts with kelvin ISS simulation
 kelvin_sw_test: kelvin_sim | $(KELVIN_SW_TESTLOG_DIR)
-	cd "$(KELVIN_SW_SRC_DIR)"; \
-		bazel test --test_output=errors //... ; \
+	cd "$(KELVIN_SW_SRC_DIR)" && \
+		bazel test --test_output=errors //... && \
 		cp -rf bazel-testlogs/tests "$(KELVIN_SW_TESTLOG_DIR)"
 
 ## Clean Kelvin SW artifacts
@@ -81,8 +81,8 @@ kelvin_hw_sim: | $(KELVIN_HW_OUT_DIR)
 
 ## Tests for Kelvin HW
 kelvin_hw_test: | $(KELVIN_HW_TESTLOG_DIR)
-	cd "$(KELVIN_HW_SRC_DIR)"; \
-		bazel test --test_output=errors //... ; \
+	cd "$(KELVIN_HW_SRC_DIR)" && \
+		bazel test --test_output=errors //... && \
 		cp -rf bazel-testlogs/tests "$(KELVIN_HW_TESTLOG_DIR)"
 
 ## Clean Kelvin HW artifacts
