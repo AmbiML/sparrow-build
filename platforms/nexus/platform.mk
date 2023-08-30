@@ -83,3 +83,6 @@ cantrip-clean-headers::
 	rm -f $(TIMER_HJSON)
 	rm -f $(TIMER_HEADER)
 	rm -f $(TOP_MATCHA_IRQ_HEADER) $(TOP_MATCHA_MEMORY_HEADER)
+
+# Ensure we build verilator as part of tools for this platform
+tools:: verilator

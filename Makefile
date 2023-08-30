@@ -32,6 +32,7 @@ include $(ROOTDIR)/build/cantrip_tests.mk
 include $(ROOTDIR)/build/minisel.mk
 include $(ROOTDIR)/build/flatbuffers.mk
 include $(ROOTDIR)/build/spike.mk
+include $(ROOTDIR)/build/verilator.mk
 
 include $(ROOTDIR)/build/platforms/$(PLATFORM)/platform.mk
 
@@ -56,7 +57,7 @@ $(OUT):
 # This includes Rust, GCC, CLANG, verilator, qemu, and renode.
 #
 # Output is placed in cache/ and out/host.
-tools: install_rust install_gcc install_llvm install_kelvin verilator renode qemu
+tools:: install_rust install_gcc install_llvm install_kelvin renode qemu
 
 ## Cleans the entire system
 #

@@ -8,8 +8,6 @@ CANTRIP_PLATFORM_APT_DEPS=\
 include $(ROOTDIR)/build/platforms/sparrow/renode.mk
 include $(ROOTDIR)/build/platforms/sparrow/riscv_toolchain.mk
 include $(ROOTDIR)/build/platforms/sparrow/verible.mk
-include $(ROOTDIR)/build/platforms/sparrow/verilator.mk
-
 
 include $(ROOTDIR)/build/platforms/sparrow/cantrip.mk
 include $(ROOTDIR)/build/platforms/sparrow/cantrip_builtins.mk
@@ -97,3 +95,6 @@ cantrip-clean-headers::
 	rm -f $(TIMER_HJSON)
 	rm -f $(TIMER_HEADER)
 	rm -f ${TOP_MATCHA_IRQ_HEADER} ${TOP_MATCHA_MEMORY_HEADER}
+
+# Ensure we build verilator as part of the tools for this platform
+tools:: verilator
