@@ -74,7 +74,7 @@ kelvin_hw_verilog: | $(KELVIN_HW_BAZEL_OUT_DIR)
 		cp -rf bazel-bin/hdl/chisel/kelvin.v "$(KELVIN_HW_BAZEL_OUT_DIR)"
 
 ## Verilated Kelvin HW simulator
-kelvin_hw_sim: | $(KELVIN_HW_OUT_DIR)
+kelvin_hw_sim: | $(KELVIN_HW_BAZEL_OUT_DIR)
 	cd "$(KELVIN_HW_SRC_DIR)" && \
 		bazel build //tests/verilator_sim:core_sim && \
 		cp -rf bazel-bin/tests/verilator_sim/core_sim "$(KELVIN_HW_BAZEL_OUT_DIR)"
