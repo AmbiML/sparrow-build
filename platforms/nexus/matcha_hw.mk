@@ -89,13 +89,13 @@ $(MATCHA_FPGA_KELVIN_BINARY_DIR):
 matcha_kelvin_fpga_tarballs: kelvin_sw | $(MATCHA_FPGA_KELVIN_BINARY_DIR)
 	cd $(MATCHA_SRC_DIR) && \
 	  bazel build --define DISABLE_VERILATOR_BUILD=true \
-			//sw/device/tests/kelvin/fpga_tests/...
+			@kelvin-binary//...
 # Copy the tarballs and sc binary to out/.
 	cd $(MATCHA_SRC_DIR) && \
-		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests/kelvin/fpga_tests/*.bin" |\
+		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests/kelvin/fpga_tests/kelvin_test_sc_extflash_fpga_nexus.bin" |\
 			xargs -I {} cp -f {} "$(MATCHA_FPGA_KELVIN_BINARY_DIR)"
 	cd $(MATCHA_SRC_DIR) && \
-		find "bazel-bin/sw/device/tests/kelvin/fpga_tests" -name "*.tar" |\
+		find "bazel-bin/external/kelvin-binary" -name "*.tar" |\
 			xargs -I {} cp -f {} "$(MATCHA_FPGA_KELVIN_BINARY_DIR)"
 
 
